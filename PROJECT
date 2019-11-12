@@ -1,0 +1,7 @@
+version: "2"
+domain: suse.rabbitmq-operator
+repo: github.com/gsantomaggio/rabbitmq-operator
+resources:
+- group: suse
+  version: v1beta1
+  kind: RabbitMQInstance

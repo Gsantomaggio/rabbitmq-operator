@@ -1,0 +1,7 @@
+apiVersion: suse.suse.rabbitmq-operator/v1beta1
+kind: RabbitMQInstance
+metadata:
+  name: rabbitmqinstance-sample
+spec:
+  instancename: "hello"
+  replicas: 3

@@ -1,0 +1,28 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - suse.suse.rabbitmq-operator
+  resources:
+  - rabbitmqinstances
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - suse.suse.rabbitmq-operator
+  resources:
+  - rabbitmqinstances/status
+  verbs:
+  - get
+  - patch
+  - update

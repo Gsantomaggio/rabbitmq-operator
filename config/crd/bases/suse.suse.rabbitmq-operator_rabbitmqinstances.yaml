@@ -1,0 +1,57 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: rabbitmqinstances.suse.suse.rabbitmq-operator
+spec:
+  group: suse.suse.rabbitmq-operator
+  names:
+    kind: RabbitMQInstance
+    listKind: RabbitMQInstanceList
+    plural: rabbitmqinstances
+    singular: rabbitmqinstance
+  scope: ""
+  validation:
+    openAPIV3Schema:
+      description: RabbitMQInstance is the Schema for the rabbitmqinstances API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: RabbitMQInstanceSpec defines the desired state of RabbitMQInstance
+          properties:
+            instancename:
+              type: string
+            replicas:
+              type: integer
+          required:
+          - instancename
+          - replicas
+          type: object
+        status:
+          description: RabbitMQInstanceStatus defines the observed state of RabbitMQInstance
+          type: object
+      type: object
+  version: v1beta1
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
