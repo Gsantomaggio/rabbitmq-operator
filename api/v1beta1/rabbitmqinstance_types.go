@@ -25,7 +25,7 @@ import (
 // RabbitMQInstanceSpec defines the desired state of RabbitMQInstance
 type RabbitMQInstanceSpec struct {
 	InstanceName string `json:"instancename"`
-	Replicas     int    `json:"replicas"`
+	Replicas     int32  `json:"replicas"`
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }

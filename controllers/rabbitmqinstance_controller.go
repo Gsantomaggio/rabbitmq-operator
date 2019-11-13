@@ -21,12 +21,18 @@ import (
 	"log"
 
 	"github.com/go-logr/logr"
+	appsv1 "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 
 	susev1beta1 "github.com/gsantomaggio/rabbitmq-operator/api/v1beta1"
 )
@@ -49,46 +55,34 @@ var (
 func (r *RabbitMQInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	instance := &susev1beta1.RabbitMQInstance{}
 	err := r.Get(context.TODO(), req.NamespacedName, instance)
-	ctx := context.Background()
+	//ctx := context.Background()
 	log1 := r.Log.WithValues("rabbitmqinstance", req.NamespacedName)
 	if err != nil {
 		log.Printf("error %s", err)
 		return ctrl.Result{}, err
 	}
 	log.Printf("Checking status of res: %d req: %s", instance.Spec.Replicas, req.NamespacedName.Name)
-	var childPods core.PodList
-	if err := r.List(ctx, &childPods, client.InNamespace(req.Namespace), client.MatchingField(ownerKey, req.Name)); err != nil {
-		log1.Error(err, "unable to list child Pods")
-		return ctrl.Result{}, err
-	}
-	for len(childPods.Items) <= instance.Spec.Replicas {
-		log.Printf("starting RabbitMQ: %d", len(childPods.Items))
+	deployment := &appsv1.Deployment{}
+	err = r.Get(context.TODO(), types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace}, deployment)
 
-		var pod *core.Pod
-		var err error
-		pod, err = r.constructPod(instance)
-
+	if err != nil && errors.IsNotFound(err) {
+		// Define a new Deployment
+		dep := r.deploymentForRabbitMQ(instance)
+		log1.Info("Creating a new Deployment.", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
+		err = r.Create(context.TODO(), dep)
 		if err != nil {
-			log.Printf("error: %s", err)
-			return ctrl.Result{}, err
+			log1.Error(err, "Failed to create new Deployment.", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
+			return reconcile.Result{}, err
 		}
-
-		if err := r.Create(ctx, pod); err != nil {
-			log1.Error(err, "unable to create Pod for RabbitMQ", "pod", pod)
-			return ctrl.Result{}, err
-
-		}
-		if err := r.List(ctx, &childPods, client.InNamespace(req.Namespace), client.MatchingField(ownerKey, req.Name)); err != nil {
-			log1.Error(err, "unable to list child Pods")
-			return ctrl.Result{}, err
-		}
-		if err := r.List(ctx, &childPods, client.InNamespace(req.Namespace), client.MatchingField(ownerKey, req.Name)); err != nil {
-			log1.Error(err, "unable to list child Pods")
-			return ctrl.Result{}, err
-		}
-		log.Printf("Finished RabbitMQ: %d", len(childPods.Items))
-
+		// Deployment created successfully - return and requeue
+		// NOTE: that the requeue is made with the purpose to provide the deployment object for the next step to ensure the deployment size is the same as the spec.
+		// Also, you could GET the deployment object again instead of requeue if you wish. See more over it here: https://godoc.org/sigs.k8s.io/controller-runtime/pkg/reconcile#Reconciler
+		return reconcile.Result{Requeue: true}, nil
+	} else if err != nil {
+		log1.Error(err, "Failed to get Deployment.")
+		return reconcile.Result{}, err
 	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -150,26 +144,51 @@ func (r *RabbitMQInstanceReconciler) constructPod(s *susev1beta1.RabbitMQInstanc
 		},
 	}
 
-	///	addEnv := func(key string, value string) {
-	///		pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env,
-	///			core.EnvVar{Name: key, Value: value})
-	///	}
-	///	bool2string := func(b bool) string {
-	///		if b {
-	///			return "TRUE"
-	///		} else {
-	///			return "FALSE"
-	///		}
-	///	}
-	///
-	// TODO: If these values are blank we should just not set the env variable.
-	//addEnv("EULA", bool2string(s.Spec.EULA))
-	//addEnv("TYPE", s.Spec.ServerType)
-	//addEnv("SERVER_NAME", s.Spec.ServerName)
-	//addEnv("OPS", strings.Join(s.Spec.Ops, ","))
-	//addEnv("WHITELIST", strings.Join(s.Spec.Allowlist, ","))
 	if err := ctrl.SetControllerReference(s, pod, r.Scheme); err != nil {
 		return nil, err
 	}
 	return pod, nil
+}
+func labelsForRabbitMQ(name string) map[string]string {
+	return map[string]string{"app": "rabbitmq", "rabbitmq_cr": name}
+}
+
+// deploymentForRabbitMQ returns a rabbitmq Deployment object
+func (r *RabbitMQInstanceReconciler) deploymentForRabbitMQ(m *susev1beta1.RabbitMQInstance) *appsv1.Deployment {
+	ls := labelsForRabbitMQ(m.Name)
+	instance := &susev1beta1.RabbitMQInstance{}
+
+	replicas := instance.Spec.Replicas
+
+	dep := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      m.Name,
+			Namespace: m.Namespace,
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: &replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: ls,
+			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: ls,
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{{
+						Image: "rabbitmq:3.8-management",
+						Name:  "rabbitmq",
+						//						Command: []string{"memcached", "-m=64", "-o", "modern", "-v"},
+						Ports: []corev1.ContainerPort{{
+							ContainerPort: 15672,
+							Name:          "rabbitmqui",
+						}},
+					}},
+				},
+			},
+		},
+	}
+	// Set Memcached instance as the owner of the Deployment.
+	controllerutil.SetControllerReference(m, dep, r.Scheme)
+	return dep
 }

@@ -35,6 +35,7 @@ spec:
             instancename:
               type: string
             replicas:
+              format: int32
               type: integer
           required:
           - instancename
