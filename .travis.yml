@@ -67,7 +67,7 @@ jobs:
           EOF
         - kubectl create -f tiller.yml
         - helm init --service-account tiller --wait
-      script: make test-cluster
+      script: make test
 
     - stage: Linting
       before_script:
