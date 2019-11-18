@@ -1,0 +1,7 @@
+version: "2"
+domain: queues
+repo: github.com/gsantomaggio/rabbitmq-operator
+resources:
+- group: scaling
+  version: v1
+  kind: RabbitMQ

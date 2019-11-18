@@ -1,0 +1,4 @@
+#!/bin/bash
+sudo docker pull rabbitmq:3.8-management
+kind load docker-image rabbitmq:3.8-management
+
