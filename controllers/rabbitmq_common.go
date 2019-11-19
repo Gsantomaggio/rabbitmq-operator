@@ -26,7 +26,7 @@ var (
 )
 
 func labelsForRabbitMQ(name string) map[string]string {
-	return map[string]string{"app": "rabbitmq", "rabbitmq_cr": name}
+	return map[string]string{"app": "rabbitmq-operator", "rabbitmq_cr": name}
 }
 
 func labelSelector(labels map[string]string) *metav1.LabelSelector {

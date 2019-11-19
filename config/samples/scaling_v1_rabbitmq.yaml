@@ -1,7 +1,7 @@
 apiVersion: scaling.queues/v1
 kind: RabbitMQ
 metadata:
-  name: rabbitmq-sample
+  name: rabbitmq-op
 spec:
   # Add fields here
-  replicas: 3
+  replicas: 2

@@ -14,7 +14,7 @@ install:
 jobs:
   include:
     - stage: Unit Tests
-      script: make test-unit
+      script: make test
 
     - stage: Cluster Tests
       before_script:
@@ -26,7 +26,7 @@ jobs:
         # It's possible to download and install KinD using curl, similar as for kubectl
         # This is useful in cases when Go toolchain isn't available or you prefer running stable version
         # Binaries for KinD are available on GitHub Releases: https://github.com/kubernetes-sigs/kind/releases
-        # - curl -Lo kind https://github.com/kubernetes-sigs/kind/releases/download/0.0.1/kind-linux-amd64 && chmod +x kind && sudo mv kind /usr/local/bin/
+        - curl -Lo kind https://github.com/kubernetes-sigs/kind/releases/download/0.0.1/kind-linux-amd64 && chmod +x kind && sudo mv kind /usr/local/bin/
 
         # Create a new Kubernetes cluster using KinD
         - kind create cluster
@@ -69,27 +69,4 @@ jobs:
         - helm init --service-account tiller --wait
       script: make test
 
-    - stage: Linting
-      before_script:
-        - curl -LO https://github.com/dominikh/go-tools/releases/download/2019.2.3/staticcheck_linux_amd64.tar.gz
-        - tar xfz staticcheck_linux_amd64.tar.gz --strip-component 1 -C $GOPATH/bin staticcheck/staticcheck
-        - go get -u golang.org/x/lint/golint
-      script: make lint
-
-    - stage: Publishing image
-      if: branch = master
-      deploy:
-        provider: script
-        script: bash -c "make publish-image"
-        skip_cleanup: true
-        on:
-          branch: master
-
-    - stage: Publishing helm chart
-      if: branch = master
-      before_deploy:
-        - . bin/include/versioning
-        - ./bin/build-helm
-        - mkdir helm-charts
-        - cp helm/quarks-job*.tgz helm-charts/
       

@@ -41,7 +41,7 @@ type RabbitMQReconciler struct {
 
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs/status,verbs=get;update;patch
-
+// handle the reconcile
 func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	logRmq := r.Log.WithValues("rabbitmq", req.NamespacedName)
