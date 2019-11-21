@@ -57,7 +57,7 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new Statefulset
-		dep, err := statefulsetForRabbitMQ(instance, r)
+		dep, err := createStatefulSet(instance, r)
 		logRmq.Info("Creating a new statefulset.", "statefulset.Namespace", dep.Namespace, "statefulset.Name", dep.Name)
 		err = r.Create(context.TODO(), dep)
 		if err != nil {
@@ -71,6 +71,18 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	} else if err != nil {
 		logRmq.Error(err, "Failed to get Deployment.")
 		return reconcile.Result{}, err
+	}
+
+	// Update the definition, in case there is a scaling up or down the statefulset
+	// has to change.
+	size := instance.Spec.Replicas
+	if *statefulset.Spec.Replicas != size {
+		statefulset.Spec.Replicas = &size
+		err = r.Update(context.TODO(), statefulset)
+		if err != nil {
+			logRmq.Error(err, "Failed to update StatefulSet.", "StatefulSet.Namespace", instance.Namespace, "StatefulSet.Name", instance.Name)
+			return reconcile.Result{}, err
+		}
 	}
 
 	return ctrl.Result{}, nil

@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func statefulsetForRabbitMQ(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.StatefulSet, error) {
+func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.StatefulSet, error) {
 	labels := labelsForRabbitMQ(m.Name)
 	replicas := m.Spec.Replicas
 	commandRMQ := []string{"rabbitmq-diagnostics", "status"}
@@ -76,4 +76,8 @@ func statefulsetForRabbitMQ(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*apps
 
 	controllerutil.SetControllerReference(m, statefulset, r.Scheme)
 	return statefulset, nil
+}
+
+func updateStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) {
+
 }
