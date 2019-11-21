@@ -39,9 +39,9 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var cfg *rest.Config
-var k8sClient client.Client
 var testEnv *envtest.Environment
 var k8sManager ctrl.Manager
+var k8sClient client.Client
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -64,6 +64,9 @@ var _ = BeforeSuite(func(done Done) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(cfg).ToNot(BeNil())
 
+	err = scheme.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = scalingv1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -80,6 +83,7 @@ var _ = BeforeSuite(func(done Done) {
 	err = (&RabbitMQReconciler{
 		Client: k8sManager.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
+		Scheme: scheme.Scheme,
 	}).SetupWithManager(k8sManager)
 	Expect(err).ToNot(HaveOccurred())
 

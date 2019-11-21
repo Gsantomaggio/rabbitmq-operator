@@ -12,10 +12,10 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var _ = Describe("WorkspaceItem Controller", func() {
+var _ = Describe("RabbitMQ Controller", func() {
 
 	const timeout = time.Second * 30
-	const interval = time.Second * 1
+	const interval = time.Second * 4
 
 	BeforeEach(func() {
 		// Add any setup steps that needs to be executed before each test
@@ -29,7 +29,7 @@ var _ = Describe("WorkspaceItem Controller", func() {
 	// your API definition.
 	// Avoid adding tests for vanilla CRUD operations because they would
 	// test Kubernetes API server, which isn't the goal here.
-	Context("Workspace Item", func() {
+	Context("RabbitMQ Item", func() {
 		It("Should create successfully", func() {
 
 			key := types.NamespacedName{
