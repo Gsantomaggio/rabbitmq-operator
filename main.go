@@ -72,6 +72,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "RabbitMQ")
 		os.Exit(1)
 	}
+
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")

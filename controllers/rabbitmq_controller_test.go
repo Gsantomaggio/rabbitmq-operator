@@ -18,7 +18,7 @@ var _ = Describe("RabbitMQ Controller", func() {
 	const interval = time.Second * 4
 
 	BeforeEach(func() {
-		// Add any setup steps that needs to be executed before each test
+
 	})
 
 	AfterEach(func() {
@@ -45,16 +45,16 @@ var _ = Describe("RabbitMQ Controller", func() {
 				Spec: scalingv1.RabbitMQSpec{
 					Replicas: 4,
 				},
+				Status: scalingv1.RabbitMQStatus{},
 			}
 
-			// Create
 			Expect(k8sClient.Create(context.Background(), created)).Should(Succeed())
-
 			By("Expecting submitted")
+			f := &scalingv1.RabbitMQ{}
+
 			Eventually(func() bool {
-				f := &scalingv1.RabbitMQ{}
 				k8sClient.Get(context.Background(), key, f)
-				return true
+				return f.ObjectMeta.Name == "rabbitmq"
 			}, timeout, interval).Should(BeTrue())
 
 			// Update
