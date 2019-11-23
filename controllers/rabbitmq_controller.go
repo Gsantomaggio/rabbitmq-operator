@@ -41,11 +41,11 @@ type RabbitMQReconciler struct {
 
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs/status,verbs=get;update;patch
-// handle the reconcile
+// Reconcile handle the reconcile
 func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	logRmq := r.Log.WithValues("rabbitmq", req.NamespacedName)
-	instance := &scalingv1.RabbitMQ{}
+	instance := scalingv1.NewRabbitMQStruct()
 	err := r.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil && errors.IsNotFound(err) {
 		log.Printf("Checking err is not nil: %s ", err)
@@ -53,7 +53,9 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	statefulset := &appsv1.StatefulSet{}
-	err = r.Get(context.TODO(), types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace}, statefulset)
+	err = r.Get(context.TODO(),
+		types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace},
+		statefulset)
 
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new Statefulset

@@ -55,6 +55,17 @@ type RabbitMQList struct {
 	Items           []RabbitMQ `json:"items"`
 }
 
+// NewRabbitMQStruct Init a RabbitMQ struct with default values
+func NewRabbitMQStruct() *RabbitMQ {
+	return &RabbitMQ{
+		Spec: RabbitMQSpec{
+			Replicas: 3,
+		},
+		Status: RabbitMQStatus{},
+	}
+
+}
+
 func init() {
 	SchemeBuilder.Register(&RabbitMQ{}, &RabbitMQList{})
 }

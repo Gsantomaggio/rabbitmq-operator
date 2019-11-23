@@ -50,15 +50,21 @@ var _ = Describe("RabbitMQ Controller", func() {
 
 			Expect(k8sClient.Create(context.Background(), created)).Should(Succeed())
 			By("Expecting submitted")
-			f := &scalingv1.RabbitMQ{}
+			failed := scalingv1.NewRabbitMQStruct()
 
 			Eventually(func() bool {
-				k8sClient.Get(context.Background(), key, f)
-				return f.ObjectMeta.Name == "rabbitmq"
+				k8sClient.Get(context.Background(), key, failed)
+				return failed.ObjectMeta.Name == "invalid"
+			}, timeout, interval).Should(BeFalse())
+
+			success := scalingv1.NewRabbitMQStruct()
+			Eventually(func() bool {
+				k8sClient.Get(context.Background(), key, success)
+				return success.ObjectMeta.Name == "rabbitmq"
 			}, timeout, interval).Should(BeTrue())
 
 			// Update
-			updated := &scalingv1.RabbitMQ{}
+			updated := scalingv1.NewRabbitMQStruct()
 			Expect(k8sClient.Get(context.Background(), key, updated)).Should(Succeed())
 
 			updated.Spec.Replicas = 3
@@ -67,14 +73,14 @@ var _ = Describe("RabbitMQ Controller", func() {
 			// Delete
 			By("Expecting to delete successfully")
 			Eventually(func() error {
-				f := &scalingv1.RabbitMQ{}
+				f := scalingv1.NewRabbitMQStruct()
 				k8sClient.Get(context.Background(), key, f)
 				return k8sClient.Delete(context.Background(), f)
 			}, timeout, interval).Should(Succeed())
 
 			By("Expecting to delete finish")
 			Eventually(func() error {
-				f := &scalingv1.RabbitMQ{}
+				f := scalingv1.NewRabbitMQStruct()
 				return k8sClient.Get(context.Background(), key, f)
 			}, timeout, interval).ShouldNot(Succeed())
 		})
