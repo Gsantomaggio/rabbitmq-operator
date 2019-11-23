@@ -25,7 +25,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 
-	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1"
+	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"

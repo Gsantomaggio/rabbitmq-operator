@@ -19,7 +19,7 @@ import (
 	"flag"
 	"os"
 
-	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1"
+	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 	"github.com/gsantomaggio/rabbitmq-operator/controllers"
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"

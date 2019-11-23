@@ -29,7 +29,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 
-	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1"
+	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 )
 
 // RabbitMQReconciler reconciles a RabbitMQ object
