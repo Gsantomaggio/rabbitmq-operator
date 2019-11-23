@@ -44,9 +44,9 @@ spec:
           description: RabbitMQStatus defines the observed state of RabbitMQ
           type: object
       type: object
-  version: v1
+  version: v1alpha
   versions:
-  - name: v1
+  - name: v1alpha
     served: true
     storage: true
 status:

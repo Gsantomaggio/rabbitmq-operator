@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1"
+	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
