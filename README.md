@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/Gsantomaggio/rabbitmq-operator.svg?branch=master)](https://travis-ci.org/Gsantomaggio/rabbitmq-operator)
 
 Kubernetes Operator to handle the RabbitMQ deploy.
+
 **The project is still experimental, not ready for production yet.**
 
 ## Build for source
@@ -22,17 +23,18 @@ make
 
  - [kind](https://github.com/kubernetes-sigs/kind)
  - [docker](https://www.docker.com/)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+ - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
 Create the Kind cluster:
 ```
 kind create cluster
-export KUBECONFIG="$(kind get kubeconfig-path --name="kind")" make && make install && make run
+export KUBECONFIG="$(kind get kubeconfig-path --name="kind")" 
+make && make install && make run
 ```
 
 Deploy the YAML
 ```
-kubectl apply -f config/samples/scaling_v1_rabbitmq.yaml
+kubectl apply -f config/samples/scaling_v1alpha_rabbitmq.yaml
 ```
 
 Check it:
@@ -50,7 +52,7 @@ rabbitmq-op-1   1/1     Running   0          115s
 
 Create the service (optional):
 ```
-kubectl apply -f config/samples/scaling_v1_rabbitmq_service.yaml
+kubectl apply -f config/samples/scaling_rabbitmq_service.yaml
 ```
 
 
