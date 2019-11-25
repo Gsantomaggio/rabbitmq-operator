@@ -22,10 +22,11 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 	}
 
 	readinessProbe := &v1.Probe{
-		Handler:          readinessProbeHandler,
-		PeriodSeconds:    50,
-		TimeoutSeconds:   60,
-		FailureThreshold: 6,
+		Handler:             readinessProbeHandler,
+		PeriodSeconds:       15,
+		TimeoutSeconds:      60,
+		FailureThreshold:    6,
+		InitialDelaySeconds: 60,
 	}
 
 	livenessProbeHandler := v1.Handler{
@@ -35,10 +36,11 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 	}
 
 	livenessProbe := &v1.Probe{
-		Handler:          livenessProbeHandler,
-		PeriodSeconds:    50,
-		TimeoutSeconds:   60,
-		FailureThreshold: 6,
+		Handler:             livenessProbeHandler,
+		PeriodSeconds:       50,
+		TimeoutSeconds:      15,
+		FailureThreshold:    6,
+		InitialDelaySeconds: 60,
 	}
 
 	statefulset := &appsv1.StatefulSet{

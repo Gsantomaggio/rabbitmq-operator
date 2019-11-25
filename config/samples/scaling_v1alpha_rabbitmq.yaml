@@ -4,5 +4,5 @@ metadata:
   name: rabbitmq-op
 spec:
   # Add fields here
-  replicas: 2
+  replicas: 3
 
