@@ -34,7 +34,7 @@ make && make install && make run
 
 Deploy the YAML
 ```
-kubectl apply -f config/samples/scaling_v1alpha_rabbitmq.yaml
+kubectl apply -f config/samples/
 ```
 
 Check it:
@@ -44,15 +44,23 @@ kubectl describe rabbitmq
 
 Running Pods:
 ```
-kubectl get pods
+$ kubectl get pods
 NAME            READY   STATUS    RESTARTS   AGE
-rabbitmq-op-0   1/1     Running   0          2m44s
-rabbitmq-op-1   1/1     Running   0          115s
+rabbitmq-op-0   1/1     Running   0          4m51s
+rabbitmq-op-1   1/1     Running   0          3m45s
+rabbitmq-op-2   1/1     Running   0          2m32s
 ```
 
-Create the service (optional):
+you can can check the cluster using the script: `utils/export_rabbitmq_ports` 
 ```
-kubectl apply -f config/samples/scaling_rabbitmq_service.yaml
+$ utils/export_rabbitmq_ports
+Forwarding from 127.0.0.1:5672 -> 5672
+Forwarding from [::1]:5672 -> 5672
+Forwarding from 127.0.0.1:15672 -> 15672
+Forwarding from [::1]:15672 -> 15672
+Forwarding from 127.0.0.1:15692 -> 15692
+Forwarding from [::1]:15692 -> 15692
+Handling connection for 15672
 ```
 
-
+Then http://localhost:15672 (guest guest)

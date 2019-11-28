@@ -42,9 +42,7 @@ var _ = Describe("RabbitMQ Controller", func() {
 					Name:      key.Name,
 					Namespace: key.Namespace,
 				},
-				Spec: scalingv1.RabbitMQSpec{
-					Replicas: 4,
-				},
+				Spec:   scalingv1.RabbitMQSpec{},
 				Status: scalingv1.RabbitMQStatus{},
 			}
 
@@ -67,7 +65,6 @@ var _ = Describe("RabbitMQ Controller", func() {
 			updated := scalingv1.NewRabbitMQStruct()
 			Expect(k8sClient.Get(context.Background(), key, updated)).Should(Succeed())
 
-			updated.Spec.Replicas = 3
 			Expect(k8sClient.Update(context.Background(), updated)).Should(Succeed())
 
 			// Delete

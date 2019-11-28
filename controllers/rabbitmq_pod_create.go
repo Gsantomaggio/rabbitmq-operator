@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -10,10 +12,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+//func getStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.StatefulSet, error) {
+//labels := labelsForRabbitMQ(m.Name)
+
+// m.Spec.Template.ObjectMeta.Labels = labels
+// m.Spec.Template.Spec.Selector = labelSelector(labels)
+// m.Spec.Template.Spec.Template.ObjectMeta.Labels = labels
+
+//	controllerutil.SetControllerReference(m, &m.Spec.Template, r.Scheme)
+//	return &m.Spec.Template, nil
+//}
+
 func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.StatefulSet, error) {
 	labels := labelsForRabbitMQ(m.Name)
-	replicas := m.Spec.Replicas
+	replicas := &m.Spec.Replicas
 	commandRMQ := []string{"rabbitmq-diagnostics", "status"}
+	var mode int32 = 0777
 
 	readinessProbeHandler := v1.Handler{
 		Exec: &v1.ExecAction{
@@ -56,19 +70,89 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 		Spec: appsv1.StatefulSetSpec{
 			Selector:    labelSelector(labels),
 			ServiceName: m.Name,
-			Replicas:    &replicas,
+			Replicas:    replicas,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
 					TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
+					Volumes: []v1.Volume{
+						v1.Volume{
+							Name: "config-volume",
+							VolumeSource: v1.VolumeSource{
+								ConfigMap: &v1.ConfigMapVolumeSource{
+									DefaultMode: &mode,
+									LocalObjectReference: v1.LocalObjectReference{
+										Name: "rabbitmq-config",
+									},
+									Items: []v1.KeyToPath{
+										v1.KeyToPath{
+											Key:  "rabbitmq.conf",
+											Path: "rabbitmq.conf",
+										},
+										v1.KeyToPath{
+											Key:  "enabled_plugins",
+											Path: "enabled_plugins",
+										},
+									},
+								},
+							},
+						},
+					},
 					Containers: []corev1.Container{
 						corev1.Container{
 							Name:           "rabbitmq",
-							Image:          "rabbitmq:3.8-management",
+							Image:          "rabbitmq:3.8.0",
 							LivenessProbe:  livenessProbe,
 							ReadinessProbe: readinessProbe,
+							VolumeMounts: []v1.VolumeMount{
+								v1.VolumeMount{
+									Name:      "config-volume",
+									MountPath: "/etc/rabbitmq",
+								},
+							},
+							Env: []v1.EnvVar{
+								v1.EnvVar{
+									Name: "MY_POD_NAME",
+									ValueFrom: &v1.EnvVarSource{
+										FieldRef: &v1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.name",
+										},
+									},
+								},
+								v1.EnvVar{
+									Name: "MY_POD_NAMESPACE",
+									ValueFrom: &v1.EnvVarSource{
+										FieldRef: &v1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.namespace",
+										},
+									},
+								},
+
+								v1.EnvVar{
+									Name:  "RABBITMQ_USE_LONGNAME",
+									Value: "true",
+								},
+								v1.EnvVar{
+									Name:  "K8S_SERVICE_NAME",
+									Value: "rabbitmq-op",
+								},
+								v1.EnvVar{
+									Name:  "RABBITMQ_NODENAME",
+									Value: fmt.Sprintf("rabbit@%s.%s.%s.svc.cluster.local", "$(MY_POD_NAME)", "$(K8S_SERVICE_NAME)", "$(MY_POD_NAMESPACE)"),
+								},
+								v1.EnvVar{
+									Name:  "K8S_HOSTNAME_SUFFIX",
+									Value: fmt.Sprintf(".%s.%s.svc.cluster.local", m.Name, m.Namespace),
+								},
+								v1.EnvVar{
+									Name:  "RABBITMQ_ERLANG_COOKIE",
+									Value: "here_need_a_secret",
+								},
+							},
 						},
 					},
 				},

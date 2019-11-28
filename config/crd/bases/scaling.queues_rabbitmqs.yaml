@@ -34,7 +34,8 @@ spec:
           properties:
             replicas:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-                Important: Run "make" to regenerate code after modifying this file'
+                Important: Run "make" to regenerate code after modifying this file
+                Template v1.StatefulSet `json:"template"`'
               format: int32
               type: integer
           required:

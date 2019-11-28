@@ -26,6 +26,7 @@ import (
 type RabbitMQSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	// Template v1.StatefulSet `json:"template"`
 	Replicas int32 `json:"replicas"`
 }
 
@@ -58,9 +59,7 @@ type RabbitMQList struct {
 // NewRabbitMQStruct Init a RabbitMQ struct with default values
 func NewRabbitMQStruct() *RabbitMQ {
 	return &RabbitMQ{
-		Spec: RabbitMQSpec{
-			Replicas: 3,
-		},
+		Spec:   RabbitMQSpec{},
 		Status: RabbitMQStatus{},
 	}
 

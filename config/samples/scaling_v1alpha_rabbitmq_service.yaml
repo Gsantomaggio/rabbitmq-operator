@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-op
+spec:
+  selector:
+    app: rabbitmq-operator
+  ports:
+    - name: http 
+      protocol: TCP
+      port: 15676
+      targetPort: 15676
+    - name: amqp
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: epmd
+      protocol: TCP
+      port: 4369
+      targetPort: 4369

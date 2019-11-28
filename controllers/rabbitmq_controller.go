@@ -44,6 +44,8 @@ type RabbitMQReconciler struct {
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs/status,verbs=get;update;patch
 // Reconcile handle the reconcile
 func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	log.Printf("Checking.............. : %s ", req.NamespacedName)
+
 	_ = context.Background()
 	logRmq := r.Log.WithValues("rabbitmq", req.NamespacedName)
 	instance := scalingv1.NewRabbitMQStruct()
@@ -54,19 +56,26 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	statefulset := &appsv1.StatefulSet{}
+
 	err = r.Get(context.TODO(),
 		types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace},
 		statefulset)
 
+	if err != nil && errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, nil
+	}
+
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new Statefulset
 		dep, err := createStatefulSet(instance, r)
-		err = r.Create(context.TODO(), dep)
-		if err != nil {
+
+		err = r.Create(context.TODO(), dep.DeepCopy())
+		if err != nil && errors.IsAlreadyExists(err) == false {
 			logRmq.Error(err, "Failed to create new statefulset.", "statefulset.Namespace", dep.Namespace, "statefulset.Name", dep.Name)
 			return reconcile.Result{}, err
 		}
-		r.Recorder.Event(instance, "Normal", "Creating", fmt.Sprintf("Creating_1 Statefulset %s/%s", dep.Namespace, dep.Name))
+
+		r.Recorder.Event(instance, "Normal", "Creating", fmt.Sprintf("Creating Statefulset %s/%s", dep.Namespace, dep.Name))
 		// Deployment created successfully - return and requeue
 		// NOTE: that the requeue is made with the purpose to provide the deployment object for the next step to ensure the deployment size is the same as the spec.
 		// Also, you could GET the deployment object again instead of requeue if you wish. See more over it here: https://godoc.org/sigs.k8s.io/controller-runtime/pkg/reconcile#Reconciler
@@ -74,22 +83,6 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	} else if err != nil {
 		logRmq.Error(err, "Failed to get Deployment.")
 		return reconcile.Result{}, err
-	}
-
-	// Update the definition, in case there is a scaling up or down the statefulset
-	// has to change.
-	size := instance.Spec.Replicas
-	if *statefulset.Spec.Replicas != size {
-		r.Recorder.Event(instance, "Normal", "Scaling", fmt.Sprintf("Scaling Statefulset %s/%s, from %d to %d",
-			req.NamespacedName, req.Name, *statefulset.Spec.Replicas, size))
-
-		statefulset.Spec.Replicas = &size
-
-		err = r.Update(context.TODO(), statefulset)
-		if err != nil {
-			logRmq.Error(err, "Failed to update StatefulSet.", "StatefulSet.Namespace", instance.Namespace, "StatefulSet.Name", instance.Name)
-			return reconcile.Result{}, err
-		}
 	}
 
 	return ctrl.Result{}, nil
