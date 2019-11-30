@@ -82,9 +82,10 @@ var _ = BeforeSuite(func(done Done) {
 	})
 
 	err = (&RabbitMQReconciler{
-		Client: k8sManager.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
-		Scheme: scheme.Scheme,
+		Client:   k8sManager.GetClient(),
+		Log:      ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
+		Scheme:   scheme.Scheme,
+		Recorder: k8sManager.GetEventRecorderFor("rabbitmq"),
 	}).SetupWithManager(k8sManager)
 	Expect(err).ToNot(HaveOccurred())
 

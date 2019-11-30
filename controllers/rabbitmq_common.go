@@ -32,3 +32,7 @@ func labelsForRabbitMQ(name string) map[string]string {
 func labelSelector(labels map[string]string) *metav1.LabelSelector {
 	return &metav1.LabelSelector{MatchLabels: labels}
 }
+
+func labelsForHelloStateful(name string) map[string]string {
+	return map[string]string{"app": "rabbitmq-operator", "rabbitmq_cr": name}
+}

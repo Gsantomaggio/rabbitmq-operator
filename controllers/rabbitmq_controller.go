@@ -44,11 +44,14 @@ type RabbitMQReconciler struct {
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs/status,verbs=get;update;patch
 // Reconcile handle the reconcile
 func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	log.Printf("Checking.............. : %s ", req.NamespacedName)
+
+	//log.Printf("Checking.............. : %s ", req.NamespacedName)
 
 	_ = context.Background()
 	logRmq := r.Log.WithValues("rabbitmq", req.NamespacedName)
 	instance := scalingv1.NewRabbitMQStruct()
+	r.Recorder.Event(instance, "Normal", "Create", fmt.Sprintf("Reconcile  %s/%s", req.Namespace, req.Name))
+
 	err := r.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil && errors.IsNotFound(err) {
 		log.Printf("Checking err is not nil: %s ", err)
@@ -66,6 +69,12 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	if err != nil && errors.IsNotFound(err) {
+		serv, errSrv := newService(instance, r)
+		errSrv = r.Create(context.TODO(), serv.DeepCopy())
+		if errSrv != nil && errors.IsAlreadyExists(errSrv) == false {
+			logRmq.Error(errSrv, "Failed to create new Service.", "Service Namespace", serv.Namespace, "Service Name:", serv.Name)
+			return reconcile.Result{}, errSrv
+		}
 		// Define a new Statefulset
 		dep, err := createStatefulSet(instance, r)
 

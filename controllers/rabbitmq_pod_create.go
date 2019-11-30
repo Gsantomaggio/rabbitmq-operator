@@ -23,6 +23,27 @@ import (
 //	return &m.Spec.Template, nil
 //}
 
+func newService(cr *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*corev1.Service, error) {
+	labels := labelsForHelloStateful(cr.ObjectMeta.Name)
+	service := &corev1.Service{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "Service",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cr.ObjectMeta.Name,
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Spec: corev1.ServiceSpec{
+			ClusterIP: corev1.ClusterIPNone,
+			Selector:  labels,
+		},
+	}
+	controllerutil.SetControllerReference(cr, service, r.Scheme)
+	return service, nil
+}
+
 func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.StatefulSet, error) {
 	labels := labelsForRabbitMQ(m.Name)
 	replicas := &m.Spec.Replicas
@@ -103,7 +124,7 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 					Containers: []corev1.Container{
 						corev1.Container{
 							Name:           "rabbitmq",
-							Image:          "rabbitmq:3.8.0",
+							Image:          "rabbitmq:3.8.1",
 							LivenessProbe:  livenessProbe,
 							ReadinessProbe: readinessProbe,
 							VolumeMounts: []v1.VolumeMount{

@@ -24,9 +24,11 @@ rules:
   - get
   - update
   - patch
+  - list
 - apiGroups:
   - ""
   resources:
   - events
   verbs:
   - create
+  - list
