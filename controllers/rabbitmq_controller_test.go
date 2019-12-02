@@ -42,7 +42,18 @@ var _ = Describe("RabbitMQ Controller", func() {
 					Name:      key.Name,
 					Namespace: key.Namespace,
 				},
-				Spec:   scalingv1.RabbitMQSpec{},
+				Spec: scalingv1.RabbitMQSpec{
+					Replicas: 3,
+					Template: scalingv1.TemplateSpec{
+						Spec: scalingv1.ContainerSpec{
+							Contaniers: scalingv1.ContainerDetailsSpec{
+								Name:            "rabbtimq",
+								Image:           "rabbitmq",
+								ImagePullPolicy: "ifNotPreset",
+							},
+						},
+					},
+				},
 				Status: scalingv1.RabbitMQStatus{},
 			}
 

@@ -27,4 +27,10 @@ kind: RabbitMQ
 metadata:
   name: rabbitmq-op
 spec: 
-  replicas: 3
+  replicas: 4
+  template:
+    spec:
+      contaniers:
+        name: rabbitmq-k8s
+        image: rabbitmq:3.7.22
+        imagePullPolicy: IfNotPresent 

@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= rabbitmq-operator:1
+IMG ?= rabbitmq-operator:2
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
@@ -56,7 +56,12 @@ docker-build: test
 
 # Push the docker image
 docker-push:
-	docker push ${IMG}
+	docker push docker.pkg.github.com/gsantomaggio/rabbitmq-operator/${IMG}
+
+
+docker-push-on-github:
+	docker build . -t docker.pkg.github.com/gsantomaggio/rabbitmq-operator/${IMG}
+	docker push docker.pkg.github.com/gsantomaggio/rabbitmq-operator/${IMG}
 
 # find or download controller-gen
 # download controller-gen if necessary

@@ -44,9 +44,6 @@ type RabbitMQReconciler struct {
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs/status,verbs=get;update;patch
 // Reconcile handle the reconcile
 func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-
-	//log.Printf("Checking.............. : %s ", req.NamespacedName)
-
 	_ = context.Background()
 	logRmq := r.Log.WithValues("rabbitmq", req.NamespacedName)
 	instance := scalingv1.NewRabbitMQStruct()
@@ -63,10 +60,6 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	err = r.Get(context.TODO(),
 		types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace},
 		statefulset)
-
-	if err != nil && errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, nil
-	}
 
 	if err != nil && errors.IsNotFound(err) {
 		serv, errSrv := newService(instance, r)
@@ -92,6 +85,24 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	} else if err != nil {
 		logRmq.Error(err, "Failed to get Deployment.")
 		return reconcile.Result{}, err
+	}
+
+	size := instance.Spec.Replicas
+
+	if size != *statefulset.Spec.Replicas {
+		r.Recorder.Event(instance, "Normal", "Scaling",
+			fmt.Sprintf("Scaling Statefulset  %s/%s, from %d to %d", req.Namespace, req.Name, *statefulset.Spec.Replicas, size))
+
+		statefulset.Spec.Replicas = &size
+		err = r.Update(context.TODO(), statefulset.DeepCopy())
+		if err != nil {
+			logRmq.Error(err, "Failed to scale statefulset.", "statefulset.Namespace", req.Namespace, "statefulset.Name", req.Name)
+			return reconcile.Result{}, err
+		}
+	}
+
+	if err != nil && errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, nil
 	}
 
 	return ctrl.Result{}, nil

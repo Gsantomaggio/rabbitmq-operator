@@ -61,7 +61,7 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 		PeriodSeconds:       15,
 		TimeoutSeconds:      60,
 		FailureThreshold:    6,
-		InitialDelaySeconds: 60,
+		InitialDelaySeconds: 30,
 	}
 
 	livenessProbeHandler := v1.Handler{
@@ -75,7 +75,7 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 		PeriodSeconds:       50,
 		TimeoutSeconds:      15,
 		FailureThreshold:    6,
-		InitialDelaySeconds: 60,
+		InitialDelaySeconds: 30,
 	}
 
 	statefulset := &appsv1.StatefulSet{
@@ -123,10 +123,11 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 					},
 					Containers: []corev1.Container{
 						corev1.Container{
-							Name:           "rabbitmq",
-							Image:          "rabbitmq:3.8.1",
-							LivenessProbe:  livenessProbe,
-							ReadinessProbe: readinessProbe,
+							Name:            m.Spec.Template.Spec.Contaniers.Name,
+							Image:           m.Spec.Template.Spec.Contaniers.Image,
+							LivenessProbe:   livenessProbe,
+							ReadinessProbe:  readinessProbe,
+							ImagePullPolicy: m.Spec.Template.Spec.Contaniers.ImagePullPolicy,
 							VolumeMounts: []v1.VolumeMount{
 								v1.VolumeMount{
 									Name:      "config-volume",

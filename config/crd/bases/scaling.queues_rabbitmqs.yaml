@@ -38,6 +38,30 @@ spec:
                 Template v1.StatefulSet `json:"template"`'
               format: int32
               type: integer
+            template:
+              description: TemplateSpec maps the template spec
+              properties:
+                spec:
+                  description: ContainerSpec maps the container spec
+                  properties:
+                    contaniers:
+                      description: ContainerDetailsSpec maps the container spec
+                      properties:
+                        image:
+                          type: string
+                        imagePullPolicy:
+                          description: PullPolicy describes a policy for if/when to
+                            pull a container image
+                          type: string
+                        name:
+                          type: string
+                      required:
+                      - image
+                      - imagePullPolicy
+                      - name
+                      type: object
+                  type: object
+              type: object
           required:
           - replicas
           type: object
