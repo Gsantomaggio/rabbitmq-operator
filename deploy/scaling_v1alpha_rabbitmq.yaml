@@ -1,0 +1,36 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: endpoint-reader
+ 
+rules:
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: 
+    - get
+    - list
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: endpoint-reader
+subjects:
+- kind: ServiceAccount
+  name: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: endpoint-reader
+--- 
+apiVersion: scaling.queues/v1alpha
+kind: RabbitMQ
+metadata:
+  name: rabbitmq-op
+spec: 
+  replicas: 4
+  template:
+    spec:
+      contaniers:
+        name: rabbitmq-k8s
+        image: rabbitmq:3.7.22
+        imagePullPolicy: IfNotPresent 
