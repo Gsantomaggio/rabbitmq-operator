@@ -27,7 +27,7 @@ kind: RabbitMQ
 metadata:
   name: rabbitmq-op
 spec: 
-  replicas: 4
+  replicas: 3
   template:
     spec:
       contaniers:
