@@ -25,7 +25,7 @@ Deploy RabbitMQ using the Operator:
 kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_v1alpha_rabbitmq.yam
 ```
 
-See the `Check the Installation` section to test it
+See the [Check the Installation](#check-the-installation) section to test it
 
 ## Build for source
 ### Requirements:
@@ -58,7 +58,8 @@ Deploy the YAML
 ```
 kubectl apply -f config/samples/
 ```
-See the `Check the Installation` section to test it
+See the [Check the Installation](#check-the-installation) section to test it
+
 
 ## Check the Installation
 
