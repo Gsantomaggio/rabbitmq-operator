@@ -11,7 +11,7 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 
 Install the operator:
 ```
-kubectl apply -f https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/rabbitmq-operator_latest.
+kubectl apply -f https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/rabbitmq-operator_latest.yaml
 ```
  
 Install the confing map example file:
