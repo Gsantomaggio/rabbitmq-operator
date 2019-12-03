@@ -11,7 +11,7 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 
 Install the operator:
 ```
-kubectl apply -f https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/rabbitmq-operator_latest.
+kubectl apply -f https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/rabbitmq-operator_latest.yaml
 ```
  
 Install the confing map example file:
@@ -22,10 +22,10 @@ kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operat
 
 Deploy RabbitMQ using the Operator:
 ```
-kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_v1alpha_rabbitmq.yam
+kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_v1alpha_rabbitmq.yaml
 ```
 
-See the `Check the Installation` section to test it
+See the [Check the Installation](#check-the-installation) section to test it
 
 ## Build for source
 ### Requirements:
@@ -54,11 +54,12 @@ export KUBECONFIG="$(kind get kubeconfig-path --name="kind")"
 make && make install && make run
 ```
 
-Deploy the YAML
+Deploy the YAML files
 ```
 kubectl apply -f config/samples/
 ```
-See the `Check the Installation` section to test it
+See the [Check the Installation](#check-the-installation) section to test it
+
 
 ## Check the Installation
 
@@ -76,7 +77,7 @@ rabbitmq-op-1   1/1     Running   0          3m45s
 rabbitmq-op-2   1/1     Running   0          2m32s
 ```
 
-you can can check the cluster using the script: `utils/export_rabbitmq_ports` 
+You can check the cluster locally using the script: `utils/export_rabbitmq_ports` 
 ```
 $ utils/export_rabbitmq_ports
 Forwarding from 127.0.0.1:5672 -> 5672
