@@ -32,5 +32,5 @@ spec:
     spec:
       contaniers:
         name: rabbitmq-k8s
-        image: rabbitmq:3.7.22
+        image: rabbitmq:3.8.1
         imagePullPolicy: IfNotPresent 
