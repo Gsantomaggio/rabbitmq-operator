@@ -22,7 +22,7 @@ kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operat
 
 Deploy RabbitMQ using the Operator:
 ```
-kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_v1alpha_rabbitmq.yam
+kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_v1alpha_rabbitmq.yaml
 ```
 
 See the [Check the Installation](#check-the-installation) section to test it
