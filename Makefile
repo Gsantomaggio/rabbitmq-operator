@@ -72,10 +72,10 @@ docker-push-on-dockerhub:
 	docker tag ${IMG_BASE}:latest  gsantomaggio/${IMG_BASE}:latest
 	docker push gsantomaggio/${IMG_BASE}:latest
 	
-	cd config/manager && kustomize edit set image controller=${IMG} 
+	cd config/manager && kustomize edit set image controller=gsantomaggio/${IMG} 
 	kustomize build config/default  > deploy/rabbitmq-operator_tag.yaml
 	
-	cd config/manager && kustomize edit set image controller=${IMG_BASE}:latest 
+	cd config/manager && kustomize edit set image controller=gsantomaggio/${IMG_BASE}:latest 
 	kustomize build config/default  > deploy/rabbitmq-operator_latest.yaml
 
 docker-push-on-github:
