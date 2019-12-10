@@ -50,6 +50,16 @@ var _ = Describe("RabbitMQ Controller", func() {
 								Name:            "rabbtimq",
 								Image:           "rabbitmq",
 								ImagePullPolicy: "ifNotPreset",
+								LivenessProbe: scalingv1.CheckProbe{
+									InitialDelaySeconds: 60,
+									TimeoutSeconds:      10,
+									PeriodSeconds:       30,
+								},
+								ReadinessProbe: scalingv1.CheckProbe{
+									InitialDelaySeconds: 60,
+									TimeoutSeconds:      10,
+									PeriodSeconds:       30,
+								},
 							},
 						},
 					},

@@ -109,7 +109,8 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 }
 
 func (r *RabbitMQReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&scalingv1.RabbitMQ{}).
+	c := ctrl.NewControllerManagedBy(mgr)
+	return c.For(&scalingv1.RabbitMQ{}).
 		Complete(r)
+
 }

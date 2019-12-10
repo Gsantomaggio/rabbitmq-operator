@@ -58,10 +58,10 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 
 	readinessProbe := &v1.Probe{
 		Handler:             readinessProbeHandler,
-		PeriodSeconds:       15,
-		TimeoutSeconds:      60,
+		PeriodSeconds:       m.Spec.Template.Spec.Contaniers.ReadinessProbe.PeriodSeconds,
+		TimeoutSeconds:      m.Spec.Template.Spec.Contaniers.ReadinessProbe.TimeoutSeconds,
 		FailureThreshold:    6,
-		InitialDelaySeconds: 30,
+		InitialDelaySeconds: m.Spec.Template.Spec.Contaniers.ReadinessProbe.InitialDelaySeconds,
 	}
 
 	livenessProbeHandler := v1.Handler{
@@ -72,10 +72,10 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 
 	livenessProbe := &v1.Probe{
 		Handler:             livenessProbeHandler,
-		PeriodSeconds:       50,
-		TimeoutSeconds:      15,
+		PeriodSeconds:       m.Spec.Template.Spec.Contaniers.LivenessProbe.PeriodSeconds,
+		TimeoutSeconds:      m.Spec.Template.Spec.Contaniers.LivenessProbe.TimeoutSeconds,
 		FailureThreshold:    6,
-		InitialDelaySeconds: 30,
+		InitialDelaySeconds: m.Spec.Template.Spec.Contaniers.LivenessProbe.InitialDelaySeconds,
 	}
 
 	statefulset := &appsv1.StatefulSet{
@@ -184,8 +184,4 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.St
 
 	controllerutil.SetControllerReference(m, statefulset, r.Scheme)
 	return statefulset, nil
-}
-
-func updateStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) {
-
 }

@@ -28,6 +28,8 @@ type ContainerDetailsSpec struct {
 	Name            string        `json:"name"`
 	Image           string        `json:"image"`
 	ImagePullPolicy v1.PullPolicy `json:"imagePullPolicy"`
+	ReadinessProbe  CheckProbe    `json:"readinessProbe"`
+	LivenessProbe   CheckProbe    `json:"livenessProbe"`
 }
 
 // ContainerSpec maps the container spec
@@ -38,6 +40,14 @@ type ContainerSpec struct {
 // TemplateSpec maps the template spec
 type TemplateSpec struct {
 	Spec ContainerSpec `json:"spec,omitempty"`
+}
+
+// CheckProbe contains the "probes" configurations
+// as livenessProbe and readinessProbe
+type CheckProbe struct {
+	InitialDelaySeconds int32 `json:"initialDelaySeconds"`
+	PeriodSeconds       int32 `json:"periodSeconds"`
+	TimeoutSeconds      int32 `json:"timeoutSeconds"`
 }
 
 // RabbitMQSpec defines the desired state of RabbitMQ
@@ -81,7 +91,6 @@ func NewRabbitMQStruct() *RabbitMQ {
 		Spec:   RabbitMQSpec{},
 		Status: RabbitMQStatus{},
 	}
-
 }
 
 func init() {

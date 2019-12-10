@@ -53,12 +53,50 @@ spec:
                           description: PullPolicy describes a policy for if/when to
                             pull a container image
                           type: string
+                        livenessProbe:
+                          description: CheckProbe contains the "probes" configurations
+                            as livenessProbe and readinessProbe
+                          properties:
+                            initialDelaySeconds:
+                              format: int32
+                              type: integer
+                            periodSeconds:
+                              format: int32
+                              type: integer
+                            timeoutSeconds:
+                              format: int32
+                              type: integer
+                          required:
+                          - initialDelaySeconds
+                          - periodSeconds
+                          - timeoutSeconds
+                          type: object
                         name:
                           type: string
+                        readinessProbe:
+                          description: CheckProbe contains the "probes" configurations
+                            as livenessProbe and readinessProbe
+                          properties:
+                            initialDelaySeconds:
+                              format: int32
+                              type: integer
+                            periodSeconds:
+                              format: int32
+                              type: integer
+                            timeoutSeconds:
+                              format: int32
+                              type: integer
+                          required:
+                          - initialDelaySeconds
+                          - periodSeconds
+                          - timeoutSeconds
+                          type: object
                       required:
                       - image
                       - imagePullPolicy
+                      - livenessProbe
                       - name
+                      - readinessProbe
                       type: object
                   type: object
               type: object
