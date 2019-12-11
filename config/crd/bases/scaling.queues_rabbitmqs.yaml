@@ -38,6 +38,9 @@ spec:
                 Template v1.StatefulSet `json:"template"`'
               format: int32
               type: integer
+            serviceDefinion:
+              description: ServiceDefinition describes the service definition
+              type: string
             template:
               description: TemplateSpec maps the template spec
               properties:
@@ -102,6 +105,7 @@ spec:
               type: object
           required:
           - replicas
+          - serviceDefinion
           type: object
         status:
           description: RabbitMQStatus defines the observed state of RabbitMQ

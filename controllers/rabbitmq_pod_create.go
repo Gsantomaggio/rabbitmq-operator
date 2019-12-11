@@ -23,7 +23,7 @@ import (
 //	return &m.Spec.Template, nil
 //}
 
-func newService(cr *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*corev1.Service, error) {
+func newService(cr *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate) (*corev1.Service, error) {
 	labels := labelsForHelloStateful(cr.ObjectMeta.Name)
 	service := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
@@ -44,7 +44,7 @@ func newService(cr *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*corev1.Service,
 	return service, nil
 }
 
-func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconciler) (*appsv1.StatefulSet, error) {
+func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate) (*appsv1.StatefulSet, error) {
 	labels := labelsForRabbitMQ(m.Name)
 	replicas := &m.Spec.Replicas
 	commandRMQ := []string{"rabbitmq-diagnostics", "status"}

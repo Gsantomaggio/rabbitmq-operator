@@ -81,7 +81,7 @@ var _ = BeforeSuite(func(done Done) {
 		Scheme: scheme.Scheme,
 	})
 
-	err = (&RabbitMQReconciler{
+	err = (&RabbitMQReconcilerUpdate{
 		Client:   k8sManager.GetClient(),
 		Log:      ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
 		Scheme:   scheme.Scheme,

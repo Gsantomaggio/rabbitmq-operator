@@ -23,6 +23,16 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// ServiceDefinition describes the service definition
+type ServiceDefinition string
+
+const (
+	// Internal means that the service is created by the operator
+	Internal ServiceDefinition = "Internal"
+	// External means that the operator does not create the service, it usues an external one
+	External ServiceDefinition = "External"
+)
+
 // ContainerDetailsSpec maps the container spec
 type ContainerDetailsSpec struct {
 	Name            string        `json:"name"`
@@ -55,8 +65,9 @@ type RabbitMQSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	// Template v1.StatefulSet `json:"template"`
-	Replicas int32        `json:"replicas"`
-	Template TemplateSpec `json:"template,omitempty"`
+	Replicas        int32             `json:"replicas"`
+	Template        TemplateSpec      `json:"template,omitempty"`
+	ServiceDefinion ServiceDefinition `json:"serviceDefinion"`
 }
 
 // RabbitMQStatus defines the observed state of RabbitMQ

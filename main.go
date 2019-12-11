@@ -64,13 +64,23 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.RabbitMQReconciler{
+	if err = (&controllers.RabbitMQReconcilerUpdate{
 		Client:   mgr.GetClient(),
 		Log:      ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
 		Scheme:   scheme,
-		Recorder: mgr.GetEventRecorderFor("rabbitmq"),
+		Recorder: mgr.GetEventRecorderFor("rabbitmqUpdate"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "RabbitMQ")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.RabbitMQReconcilerCreate{
+		Client:   mgr.GetClient(),
+		Log:      ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
+		Scheme:   scheme,
+		Recorder: mgr.GetEventRecorderFor("rabbitmqCreate"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RabbitMQ-Create")
 		os.Exit(1)
 	}
 

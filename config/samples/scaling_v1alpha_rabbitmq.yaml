@@ -32,6 +32,7 @@ metadata:
   name: rabbitmq-op
 spec: 
   replicas: 3
+  serviceDefinion: Internal
   template:
     spec:
       contaniers:
@@ -39,10 +40,10 @@ spec:
         image: rabbitmq-events:latest
         imagePullPolicy: IfNotPresent 
         livenessProbe:
-          initialDelaySeconds: 20
+          initialDelaySeconds: 30
           periodSeconds: 60
           timeoutSeconds: 15
         readinessProbe:
           initialDelaySeconds: 20
           periodSeconds: 60
-          timeoutSeconds: 10
+          timeoutSeconds: 15

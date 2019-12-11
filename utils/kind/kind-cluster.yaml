@@ -1,0 +1,12 @@
+kind: Cluster
+apiVersion: kind.sigs.k8s.io/v1alpha3
+nodes:
+- role: control-plane
+- role: worker
+  extraPortMappings:
+  - containerPort: 15672
+    hostPort: 15672
+    listenAddress: "0.0.0.0" # Optional, defaults to "0.0.0.0"
+  - containerPort: 5672
+    hostPort: 5672
+    listenAddress: "0.0.0.0" # Optional, defaults to "0.0.0.0"

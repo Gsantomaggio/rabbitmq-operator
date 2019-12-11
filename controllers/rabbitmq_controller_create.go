@@ -18,7 +18,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/go-logr/logr"
 	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
@@ -29,11 +28,12 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-// RabbitMQReconciler reconciles a RabbitMQ object
-type RabbitMQReconciler struct {
+// RabbitMQReconcilerCreate reconciles a RabbitMQ object
+type RabbitMQReconcilerCreate struct {
 	client.Client
 	Log      logr.Logger
 	Scheme   *runtime.Scheme
@@ -42,17 +42,15 @@ type RabbitMQReconciler struct {
 
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=scaling.queues,resources=rabbitmqs/status,verbs=get;update;patch
-// Reconcile handle the reconcile
-func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+// Reconcile handles the reconcile
+func (r *RabbitMQReconcilerCreate) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
-	logRmq := r.Log.WithValues("rabbitmq", req.NamespacedName)
-	instance := scalingv1.NewRabbitMQStruct()
-	r.Recorder.Event(instance, "Normal", "Create", fmt.Sprintf("Reconcile  %s/%s", req.Namespace, req.Name))
+	logRmq := r.Log.WithValues("rabbitmq_w", req.NamespacedName)
+	logRmq.Info("Handling Create RabbitMQReconciler ")
 
-	err := r.Get(context.TODO(), req.NamespacedName, instance)
-	if err != nil && errors.IsNotFound(err) {
-		log.Printf("Checking err is not nil: %s ", err)
-		return reconcile.Result{Requeue: false}, nil
+	instance, err := getRabbitMQInstanceResource(r.Recorder, r.Client, req)
+	if err != nil {
+		return ctrl.Result{Requeue: false}, nil
 	}
 
 	statefulset := &appsv1.StatefulSet{}
@@ -62,55 +60,57 @@ func (r *RabbitMQReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		statefulset)
 
 	if err != nil && errors.IsNotFound(err) {
-		serv, errSrv := newService(instance, r)
-		errSrv = r.Create(context.TODO(), serv.DeepCopy())
-		if errSrv != nil && errors.IsAlreadyExists(errSrv) == false {
-			logRmq.Error(errSrv, "Failed to create new Service.", "Service Namespace", serv.Namespace, "Service Name:", serv.Name)
-			return reconcile.Result{}, errSrv
+		if instance.Spec.ServiceDefinion == scalingv1.Internal {
+			serv, errSrv := newService(instance, r)
+			errSrv = r.Create(context.TODO(), serv.DeepCopy())
+			if errSrv != nil && errors.IsAlreadyExists(errSrv) == false {
+				logRmq.Error(errSrv, "Failed to create new Service.", "Service Namespace", serv.Namespace,
+					"Service Name:", serv.Name)
+				return ctrl.Result{}, errSrv
+			}
 		}
+
 		// Define a new Statefulset
 		dep, err := createStatefulSet(instance, r)
 
 		err = r.Create(context.TODO(), dep.DeepCopy())
 		if err != nil && errors.IsAlreadyExists(err) == false {
 			logRmq.Error(err, "Failed to create new statefulset.", "statefulset.Namespace", dep.Namespace, "statefulset.Name", dep.Name)
-			return reconcile.Result{}, err
+			return ctrl.Result{}, err
 		}
 
-		r.Recorder.Event(instance, "Normal", "Creating", fmt.Sprintf("Creating Statefulset %s/%s", dep.Namespace, dep.Name))
+		r.Recorder.Event(instance, "Normal", "Creating",
+			fmt.Sprintf("Creating Statefulset %s/%s", dep.Namespace, dep.Name))
 		// Deployment created successfully - return and requeue
 		// NOTE: that the requeue is made with the purpose to provide the deployment object for the next step to ensure the deployment size is the same as the spec.
 		// Also, you could GET the deployment object again instead of requeue if you wish. See more over it here: https://godoc.org/sigs.k8s.io/controller-runtime/pkg/reconcile#Reconciler
-		return reconcile.Result{Requeue: true}, nil
+		return ctrl.Result{Requeue: true}, nil
 	} else if err != nil {
 		logRmq.Error(err, "Failed to get Deployment.")
-		return reconcile.Result{}, err
-	}
-
-	size := instance.Spec.Replicas
-
-	if size != *statefulset.Spec.Replicas {
-		r.Recorder.Event(instance, "Normal", "Scaling",
-			fmt.Sprintf("Scaling Statefulset  %s/%s, from %d to %d", req.Namespace, req.Name, *statefulset.Spec.Replicas, size))
-
-		statefulset.Spec.Replicas = &size
-		err = r.Update(context.TODO(), statefulset.DeepCopy())
-		if err != nil {
-			logRmq.Error(err, "Failed to scale statefulset.", "statefulset.Namespace", req.Namespace, "statefulset.Name", req.Name)
-			return reconcile.Result{}, err
-		}
-	}
-
-	if err != nil && errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, nil
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
 }
 
-func (r *RabbitMQReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *RabbitMQReconcilerCreate) SetupWithManager(mgr ctrl.Manager) error {
+	p := predicate.Funcs{
+		UpdateFunc: func(e event.UpdateEvent) bool {
+			return false
+		},
+		CreateFunc: func(e event.CreateEvent) bool {
+			return true
+		},
+
+		DeleteFunc: func(e event.DeleteEvent) bool {
+			return false
+		},
+	}
+
 	c := ctrl.NewControllerManagedBy(mgr)
 	return c.For(&scalingv1.RabbitMQ{}).
+		Named("RabbitMQCreate").
+		WithEventFilter(p).
 		Complete(r)
 
 }
