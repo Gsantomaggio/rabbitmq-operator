@@ -32,7 +32,7 @@ metadata:
   name: rabbitmq-op
 spec: 
   replicas: 3
-  serviceDefinion: Internal
+  serviceDefinion: External
   template:
     spec:
       contaniers:
