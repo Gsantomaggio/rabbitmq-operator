@@ -4,11 +4,15 @@ metadata:
   name: endpoint-reader
  
 rules:
-- apiGroups: [""]
-  resources: ["endpoints"]
+- apiGroups: 
+    - ""
+  resources: 
+    - endpoints
+    - events
   verbs: 
     - get
     - list
+    - create
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -28,9 +32,18 @@ metadata:
   name: rabbitmq-op
 spec: 
   replicas: 3
+  serviceDefinion: External
   template:
     spec:
       contaniers:
         name: rabbitmq-k8s
-        image: rabbitmq:3.8.1
+        image: rabbitmq:3.8.2
         imagePullPolicy: IfNotPresent 
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          timeoutSeconds: 15
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 15

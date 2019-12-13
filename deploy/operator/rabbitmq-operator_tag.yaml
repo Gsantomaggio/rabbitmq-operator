@@ -43,6 +43,9 @@ spec:
                 Template v1.StatefulSet `json:"template"`'
               format: int32
               type: integer
+            serviceDefinion:
+              description: ServiceDefinition describes the service definition
+              type: string
             template:
               description: TemplateSpec maps the template spec
               properties:
@@ -58,17 +61,56 @@ spec:
                           description: PullPolicy describes a policy for if/when to
                             pull a container image
                           type: string
+                        livenessProbe:
+                          description: CheckProbe contains the "probes" configurations
+                            as livenessProbe and readinessProbe
+                          properties:
+                            initialDelaySeconds:
+                              format: int32
+                              type: integer
+                            periodSeconds:
+                              format: int32
+                              type: integer
+                            timeoutSeconds:
+                              format: int32
+                              type: integer
+                          required:
+                          - initialDelaySeconds
+                          - periodSeconds
+                          - timeoutSeconds
+                          type: object
                         name:
                           type: string
+                        readinessProbe:
+                          description: CheckProbe contains the "probes" configurations
+                            as livenessProbe and readinessProbe
+                          properties:
+                            initialDelaySeconds:
+                              format: int32
+                              type: integer
+                            periodSeconds:
+                              format: int32
+                              type: integer
+                            timeoutSeconds:
+                              format: int32
+                              type: integer
+                          required:
+                          - initialDelaySeconds
+                          - periodSeconds
+                          - timeoutSeconds
+                          type: object
                       required:
                       - image
                       - imagePullPolicy
+                      - livenessProbe
                       - name
+                      - readinessProbe
                       type: object
                   type: object
               type: object
           required:
           - replicas
+          - serviceDefinion
           type: object
         status:
           description: RabbitMQStatus defines the observed state of RabbitMQ
@@ -285,7 +327,7 @@ spec:
         - --enable-leader-election
         command:
         - /manager
-        image: gsantomaggio/rabbitmq-operator:latest
+        image: gsantomaggio/rabbitmq-operator:3
         name: manager
         resources:
           limits:
