@@ -22,12 +22,6 @@ kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/down
 kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_configmap.yaml
 ```
 
-* Create the service
-
-```
-kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/rabbitmq-service.yaml
-```
-
 * Deploy RabbitMQ using the Operator:
 ```
 kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_v1alpha_rabbitmq.yaml
