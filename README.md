@@ -11,18 +11,26 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 
 Install the operator:
 ```
-kubectl apply -f https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/rabbitmq-operator_latest.yaml
-```
- 
-Install the confing map example file:
-
-```
-kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_configmap.yaml
+kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/rabbitmq-operator_latest.yaml
 ```
 
-Deploy RabbitMQ using the Operator:
+#### Use the example files:
+
+* Install the confing map example file:
+
 ```
-kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_v1alpha_rabbitmq.yaml
+kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_configmap.yaml
+```
+
+* Create the service
+
+```
+kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/rabbitmq-service.yaml
+```
+
+* Deploy RabbitMQ using the Operator:
+```
+kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_v1alpha_rabbitmq.yaml
 ```
 
 See the [Check the Installation](#check-the-installation) section to test it
