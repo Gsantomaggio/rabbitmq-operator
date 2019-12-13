@@ -7,14 +7,12 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 **The project is still experimental, not ready for production yet.**
 
 
-### Install from DockerHUB
+### Install the RabbitMQ Operator 
 
-Install the operator:
+Install the operator from Docker-Hub:
 ```
 kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/rabbitmq-operator_latest.yaml
 ```
-
-#### Use the example files:
 
 * Install the confing map example file:
 
