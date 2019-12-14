@@ -7,22 +7,22 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 **The project is still experimental, not ready for production yet.**
 
 
-### Install from DockerHUB
+### Install the RabbitMQ Operator 
 
-Install the operator:
+* Install the operator from Docker-Hub:
 ```
-kubectl apply -f https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/rabbitmq-operator_latest.yaml
-```
- 
-Install the confing map example file:
-
-```
-kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_configmap.yaml
+kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/rabbitmq-operator_latest.yaml
 ```
 
-Deploy RabbitMQ using the Operator:
+* Install the confing map example file:
+
 ```
-kubectl apply -f  https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-operator/master/deploy/scaling_v1alpha_rabbitmq.yaml
+kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_configmap.yaml
+```
+
+* Deploy RabbitMQ using the Operator:
+```
+kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_v1alpha_rabbitmq.yaml
 ```
 
 See the [Check the Installation](#check-the-installation) section to test it
