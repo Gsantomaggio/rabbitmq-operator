@@ -3,10 +3,14 @@ commonLabels:
   app: rabbitmq-operator
   rabbitmq_cr: rabbitmq 
 
-resources:
+bases:
  - ../../base
+
+resources:
+ - namespace.yaml 
  - service.yaml
 
 patchesStrategicMerge:
  - deployment.yaml
 
+namespace: ns-developing 

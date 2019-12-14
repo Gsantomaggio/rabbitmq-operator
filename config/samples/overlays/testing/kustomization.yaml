@@ -3,9 +3,12 @@ commonLabels:
   app: rabbitmq-operator
   rabbitmq_cr: rabbitmq 
 
-resources:
+bases:
  - ../../base
  
 patchesStrategicMerge:
  - deployment.yaml
+
+namespaces:
+ - testing 
 
