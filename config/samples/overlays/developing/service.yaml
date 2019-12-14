@@ -2,9 +2,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: rabbitmq-op
-  labels:
-    app: rabbitmq-operator
-    rabbitmq_cr: rabbitmq-op  
 spec:
   type: NodePort
   ports:

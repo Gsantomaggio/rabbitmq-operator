@@ -1,0 +1,22 @@
+apiVersion: scaling.queues/v1alpha
+kind: RabbitMQ
+metadata:
+  name: rabbitmq-op
+spec: 
+  replicas: 3
+  serviceDefinition: Internal
+  configMap: rabbitmq-config        
+  template:
+    spec:
+      contaniers:
+        name: rabbitmq-k8s
+        image: rabbitmq:3.8
+        imagePullPolicy: IfNotPresent 
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          timeoutSeconds: 15
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 15

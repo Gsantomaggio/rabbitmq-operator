@@ -1,0 +1,11 @@
+nameSuffix: -testing
+commonLabels:
+  app: rabbitmq-operator
+  rabbitmq_cr: rabbitmq 
+
+resources:
+ - ../../base
+ 
+patchesStrategicMerge:
+ - deployment.yaml
+

@@ -1,0 +1,8 @@
+apiVersion: scaling.queues/v1alpha
+kind: RabbitMQ
+metadata:
+  name: rabbitmq-op
+spec: 
+  serviceDefinition: Internal
+  configMap: rabbitmq-config-testing
+         
