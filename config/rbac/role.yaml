@@ -45,6 +45,9 @@ rules:
   verbs:
   - create
   - delete
+  - list
+  - get
+  - watch
 - apiGroups: [""]
   resources:
   - events

@@ -22,6 +22,7 @@ import (
 	"github.com/go-logr/logr"
 	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -60,7 +61,9 @@ func (r *RabbitMQReconcilerCreate) Reconcile(req ctrl.Request) (ctrl.Result, err
 		statefulset)
 
 	if err != nil && errors.IsNotFound(err) {
-		if instance.Spec.ServiceDefinion == scalingv1.Internal {
+		service := &corev1.Service{}
+
+		if instance.Spec.ServiceDefinition == scalingv1.Internal {
 			serv, errSrv := newService(instance, r)
 			errSrv = r.Create(context.TODO(), serv.DeepCopy())
 			if errSrv != nil && errors.IsAlreadyExists(errSrv) == false {
@@ -68,10 +71,16 @@ func (r *RabbitMQReconcilerCreate) Reconcile(req ctrl.Request) (ctrl.Result, err
 					"Service Name:", serv.Name)
 				return ctrl.Result{}, errSrv
 			}
+			service = serv
+		} else {
+
+			err = r.Get(context.TODO(),
+				types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace},
+				service)
 		}
 
 		// Define a new Statefulset
-		dep, err := createStatefulSet(instance, r)
+		dep, err := createStatefulSet(instance, r, service)
 
 		err = r.Create(context.TODO(), dep.DeepCopy())
 		if err != nil && errors.IsAlreadyExists(err) == false {

@@ -32,13 +32,15 @@ spec:
         spec:
           description: RabbitMQSpec defines the desired state of RabbitMQ
           properties:
+            configMap:
+              type: string
             replicas:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "make" to regenerate code after modifying this file
                 Template v1.StatefulSet `json:"template"`'
               format: int32
               type: integer
-            serviceDefinion:
+            serviceDefinition:
               description: ServiceDefinition describes the service definition
               type: string
             template:
@@ -104,8 +106,9 @@ spec:
                   type: object
               type: object
           required:
+          - configMap
           - replicas
-          - serviceDefinion
+          - serviceDefinition
           type: object
         status:
           description: RabbitMQStatus defines the observed state of RabbitMQ

@@ -24,7 +24,7 @@ import (
 //}
 
 func newService(cr *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate) (*corev1.Service, error) {
-	labels := labelsForHelloStateful(cr.ObjectMeta.Name)
+	labels := cr.ObjectMeta.Labels
 	service := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
@@ -44,8 +44,8 @@ func newService(cr *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate) (*corev1.Se
 	return service, nil
 }
 
-func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate) (*appsv1.StatefulSet, error) {
-	labels := labelsForRabbitMQ(m.Name)
+func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate, s *corev1.Service) (*appsv1.StatefulSet, error) {
+	labels := m.ObjectMeta.Labels
 	replicas := &m.Spec.Replicas
 	commandRMQ := []string{"rabbitmq-diagnostics", "status"}
 	var mode int32 = 0777
@@ -105,7 +105,7 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate) (*app
 								ConfigMap: &v1.ConfigMapVolumeSource{
 									DefaultMode: &mode,
 									LocalObjectReference: v1.LocalObjectReference{
-										Name: "rabbitmq-config",
+										Name: m.Spec.ConfigMap,
 									},
 									Items: []v1.KeyToPath{
 										v1.KeyToPath{
@@ -160,7 +160,7 @@ func createStatefulSet(m *scalingv1.RabbitMQ, r *RabbitMQReconcilerCreate) (*app
 								},
 								v1.EnvVar{
 									Name:  "K8S_SERVICE_NAME",
-									Value: "rabbitmq-op",
+									Value: s.Name,
 								},
 								v1.EnvVar{
 									Name:  "RABBITMQ_NODENAME",

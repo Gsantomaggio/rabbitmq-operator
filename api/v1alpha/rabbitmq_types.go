@@ -65,9 +65,10 @@ type RabbitMQSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	// Template v1.StatefulSet `json:"template"`
-	Replicas        int32             `json:"replicas"`
-	Template        TemplateSpec      `json:"template,omitempty"`
-	ServiceDefinion ServiceDefinition `json:"serviceDefinion"`
+	Replicas          int32             `json:"replicas"`
+	Template          TemplateSpec      `json:"template,omitempty"`
+	ServiceDefinition ServiceDefinition `json:"serviceDefinition"`
+	ConfigMap         string            `json:"configMap"`
 }
 
 // RabbitMQStatus defines the observed state of RabbitMQ
