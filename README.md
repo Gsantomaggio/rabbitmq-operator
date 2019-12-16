@@ -26,7 +26,7 @@ The examples are built with [`kustomize`](https://github.com/kubernetes-sigs/kus
 
 For developing purpose you can use `config/samples/overlays/developing`, so:
 
-```
+```bash
 kubectl apply -k config/samples/overlays/developing
 ```
 It creates a custom Service with `nodePort` configuration, so it can be used in local configuration without load-balancers
@@ -36,11 +36,54 @@ It creates a custom Service with `nodePort` configuration, so it can be used in 
 
 For the standard purpose you can use `config/samples/overlays/testing`, so:
 
-```
+```bash
 kubectl apply -k config/samples/overlays/testing
 ```
 
 
+## Localhost developing using Kind
+### Requirements:
+
+ - [kind](https://github.com/kubernetes-sigs/kind)
+ - [docker](https://www.docker.com/)
+ - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+
+Create the Kind cluster:
+```
+kind create cluster --config utils/kind/kind-cluster.yaml
+```
+
+The `kind-cluster.yaml` configuration creates a localhost binding:
+```yaml
+ extraPortMappings:
+  - containerPort: 31672
+    hostPort: 15672
+  - containerPort: 30672
+    hostPort: 5672
+```
+
+Then you can use the Localhost developing section, the `service.yaml` exposes the `AMQP` and `HTTP` ports
+
+```yaml
+spec:
+  type: NodePort
+  ports:
+   - name: http
+     protocol: TCP
+     port: 15672
+     targetPort: 15672
+     nodePort: 31672
+   - name: amqp
+     protocol: TCP
+     port: 5672
+     targetPort: 5672
+     nodePort: 30672
+```
+
+So you can easly use it in `http://localhost:15672` and `amqp://localhost`
+
+
+See the [Check the Installation](#check-the-installation) section to test it
 
 ## Build for source
 ### Requirements:
@@ -53,27 +96,6 @@ cd rabbitmq-operator
 make
 ```
 
-
-
-## Test it using Kind
-### Requirements:
-
- - [kind](https://github.com/kubernetes-sigs/kind)
- - [docker](https://www.docker.com/)
- - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-
-Create the Kind cluster:
-```
-kind create cluster
-export KUBECONFIG="$(kind get kubeconfig-path --name="kind")" 
-make && make install && make run
-```
-
-Deploy the YAML files
-```
-kubectl apply -f config/samples/
-```
-See the [Check the Installation](#check-the-installation) section to test it
 
 
 ## Check the Installation
@@ -91,17 +113,3 @@ rabbitmq-op-0   1/1     Running   0          4m51s
 rabbitmq-op-1   1/1     Running   0          3m45s
 rabbitmq-op-2   1/1     Running   0          2m32s
 ```
-
-You can check the cluster locally using the script: `utils/export_rabbitmq_ports` 
-```
-$ utils/export_rabbitmq_ports
-Forwarding from 127.0.0.1:5672 -> 5672
-Forwarding from [::1]:5672 -> 5672
-Forwarding from 127.0.0.1:15672 -> 15672
-Forwarding from [::1]:15672 -> 15672
-Forwarding from 127.0.0.1:15692 -> 15692
-Forwarding from [::1]:15692 -> 15692
-Handling connection for 15672
-```
-
-Then http://localhost:15672 (guest guest)
