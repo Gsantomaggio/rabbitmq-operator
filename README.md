@@ -14,18 +14,33 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/rabbitmq-operator_latest.yaml
 ```
 
-* Install the confing map example file:
-
-```
-kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_configmap.yaml
-```
-
-* Deploy RabbitMQ using the Operator:
-```
-kubectl apply -f  https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.3-alpha/scaling_v1alpha_rabbitmq.yaml
-```
-
 See the [Check the Installation](#check-the-installation) section to test it
+
+
+### Deploy RabbitMQ with the Operator
+
+Inside the directory `config/samples` you can find the deploy examples.
+The examples are built with [`kustomize`](https://github.com/kubernetes-sigs/kustomize), but you don't have to install anything, the command `kubectl apply -k`  already uses kustomize.
+
+#### Localhost developing
+
+For developing purpose you can use `config/samples/overlays/developing`, so:
+
+```
+kubectl apply -k config/samples/overlays/developing
+```
+It creates a custom Service with `nodePort` configuration, so it can be used in local configuration without load-balancers
+
+
+#### Standard deploy
+
+For the standard purpose you can use `config/samples/overlays/testing`, so:
+
+```
+kubectl apply -k config/samples/overlays/testing
+```
+
+
 
 ## Build for source
 ### Requirements:
