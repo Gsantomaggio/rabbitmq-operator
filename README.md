@@ -62,7 +62,7 @@ The `kind-cluster.yaml` configuration creates a localhost binding:
     hostPort: 5672
 ```
 
-Then you can use the Localhost developing section, the `service.yaml` exposes the `AMQP` and `HTTP` ports
+Then you can use the [localhost developing](https://github.com/Gsantomaggio/rabbitmq-operator/blob/master/README.md#localhost-developing), the `service.yaml` exposes the `AMQP` and `HTTP` ports
 
 ```yaml
 spec:
