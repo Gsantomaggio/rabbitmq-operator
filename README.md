@@ -4,9 +4,6 @@
 
 Kubernetes Operator to handle the RabbitMQ deploy.
 
-**The project is still experimental, not ready for production yet.**
-
-
 ### Install the RabbitMQ Operator 
 
 * Install the operator from Docker-Hub:
@@ -42,11 +39,8 @@ kubectl apply -k config/samples/overlays/testing
 
 
 ## Localhost developing using Kind
-### Requirements:
 
- - [kind](https://github.com/kubernetes-sigs/kind)
- - [docker](https://www.docker.com/)
- - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+_[Kind](https://github.com/kubernetes-sigs/kind) is a tool for running local Kubernetes clusters using Docker container "nodes"._
 
 Create the Kind cluster:
 ```
@@ -113,3 +107,8 @@ rabbitmq-op-0   1/1     Running   0          4m51s
 rabbitmq-op-1   1/1     Running   0          3m45s
 rabbitmq-op-2   1/1     Running   0          2m32s
 ```
+
+
+## Project status
+
+**The project is still experimental, not ready for production yet.**
