@@ -6,11 +6,18 @@ spec:
   replicas: 3
   serviceDefinition: Internal
   configMap: rabbitmq-config        
+  persistentVolume:
+    name: data
+    accessModes: [ "ReadWriteOnce" ]
+    storageClass: "standard"
+    resources:
+      requests:
+        storage: 1Gi
   template:
     spec:
       contaniers:
         name: rabbitmq-k8s
-        image: rabbitmq:3.8
+        image: rabbitmq:3.8.1
         imagePullPolicy: IfNotPresent 
         livenessProbe:
           initialDelaySeconds: 30

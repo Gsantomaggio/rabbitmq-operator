@@ -1,63 +1,33 @@
 language: go
-
 go:
-  - '1.13'
-
+- '1.13'
 services:
-  - docker
-
+- docker
 install:
-  - export GOPROXY=https://proxy.golang.org
-  - go install github.com/onsi/ginkgo/ginkgo
-  - export PATH=$PATH:$GOPATH/bin
-  - curl -sL https://github.com/kubernetes-sigs/kubebuilder/releases/download/v2.2.0/kubebuilder_2.2.0_linux_amd64.tar.gz | tar -xz -C /tmp/
-  - sudo mv /tmp/kubebuilder_2.2.0_linux_amd64 /usr/local/kubebuilder
-  - export PATH=$PATH:/usr/local/kubebuilder/bin
-
+- export GOPROXY=https://proxy.golang.org
+- go install github.com/onsi/ginkgo/ginkgo
+- export PATH=$PATH:$GOPATH/bin
+- curl -sL https://github.com/kubernetes-sigs/kubebuilder/releases/download/v2.2.0/kubebuilder_2.2.0_linux_amd64.tar.gz
+  | tar -xz -C /tmp/
+- sudo mv /tmp/kubebuilder_2.2.0_linux_amd64 /usr/local/kubebuilder
+- export PATH=$PATH:/usr/local/kubebuilder/bin
 jobs:
   include:
-    - stage: Unit Tests
-      script: make test
-
-    - stage: Cluster Tests
-      before_script:
-         # Download and install kubectl
-        - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-
-        - curl -Lo kind curl -Lo kind https://github.com/kubernetes-sigs/kind/releases/download/v0.6.0/kind-linux-amd64 && chmod +x kind && sudo mv kind /usr/local/bin/
-        - export PATH=$PATH:/usr/local/bin
-        - kind create cluster
-        - export KUBECONFIG="$(kind get kubeconfig-path)"
-      script: USE_EXISTING_CLUSTER=true make test 
-    #     # Download and install helm
-    #     - curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
-    #     - chmod 700 get_helm.sh
-    #     - sudo ./get_helm.sh
-    #     # yes, heredocs are broken in before_script: https://travis-ci.community/t/multiline-commands-have-two-spaces-in-front-breaks-heredocs/2756
-    #     - |
-    #       sed 's/^  //' <<\ \ EOF > tiller.yml
-    #       ---
-    #       apiVersion: v1
-    #       kind: ServiceAccount
-    #       metadata:
-    #         name: tiller
-    #         namespace: kube-system
-    #       ---
-    #       apiVersion: rbac.authorization.k8s.io/v1
-    #       kind: ClusterRoleBinding
-    #       metadata:
-    #         name: tiller
-    #       roleRef:
-    #         apiGroup: rbac.authorization.k8s.io
-    #         kind: ClusterRole
-    #         name: cluster-admin
-    #       subjects:
-    #         - kind: ServiceAccount
-    #           name: tiller
-    #           namespace: kube-system
-    #       EOF
-    #      - kubectl create -f tiller.yml
-    #     - helm init --service-account tiller --wait
-       
-
-      
+  - stage: cover
+    script: make cover_travis
+  - stage: Unit Tests
+    script: make test
+  - stage: Cluster Tests
+    before_script:
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+      https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+    - curl -Lo kind curl -Lo kind https://github.com/kubernetes-sigs/kind/releases/download/v0.6.0/kind-linux-amd64
+      && chmod +x kind && sudo mv kind /usr/local/bin/
+    - export PATH=$PATH:/usr/local/bin
+    - kind create cluster
+    - export KUBECONFIG="$(kind get kubeconfig-path)"
+    script: USE_EXISTING_CLUSTER=true make test
+env:
+  global:
+    secure: P2RvtKakKme14c9imzSRiIUBuiNh8+higkrXICtFSqefW7rr49MBiwijcDCtmnx9zFIcI10WK/NUB0sC4uZU9UOnJZvQvGAirsFvjsJlHS+tCsbyAl1t0PynOdAwzBeYvFqVaLhoith4Sx7mbDSibNNWnzRKwDKVD8KGcslKKyoNqR2HVO23YJrJdvYoyn1sMc5TSJf7wGMlwo0+h+cymgUzQx4lG/zRgIN/tcK0rN+3Pbm4fflcdLhZo13fs2K4dXvuiXz5puKYByBMipRXyyGQAgY17jRctsfgqKVqpiXdjC6rQBTaYL7LhbnIIA2q518pcH5cipj6T6bTW/wEvgpQQWViauCdxLWAhKKNAxkwGXlEWPwpUUsxvcad6MzaQn2umCPQjTLWGBUQUCNtjxe3ukzCXdV48vD2uobN2hKQzjIZqeQVUUqhpmhZtjJoPb8nQ4zy2q0OLsyI+k8/mdJYOa2e8xht8Vyu0uQjiFgTkdPkR7y7xq9fpiapdKZXl690FVxYYxbB5/rtFcJU/fWinaKmDYnVZOwxwKUIiQktl1cS9U8Mw3n9HVxwD5E0mNzZjZEzitQA3AxOf4ZOLYGiIDy4dxwKnLcXNgkLTlwV1WDlYcWymM2kdj98LFPReaR/ki5z22+PLDcx7s2DBLnxF02vt86bBXAxZgyZFYs=

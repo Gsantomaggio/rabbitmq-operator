@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -43,7 +44,13 @@ var _ = Describe("RabbitMQ Controller", func() {
 					Namespace: key.Namespace,
 				},
 				Spec: scalingv1.RabbitMQSpec{
-					Replicas: 3,
+					Replicas:          3,
+					ConfigMap:         "TEST",
+					ServiceDefinition: "Internal",
+					PersistentVolume: scalingv1.PersistentVolumeClaimSpec{
+						StorageClass: "standard",
+						AccessModes:  []v1.PersistentVolumeAccessMode{"ReadWriteOnce"},
+					},
 					Template: scalingv1.TemplateSpec{
 						Spec: scalingv1.ContainerSpec{
 							Contaniers: scalingv1.ContainerDetailsSpec{

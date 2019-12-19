@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
+	opv1alpha "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -46,7 +46,7 @@ type RabbitMQReconcilerCreate struct {
 // Reconcile handles the reconcile
 func (r *RabbitMQReconcilerCreate) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
-	logRmq := r.Log.WithValues("rabbitmq_w", req.NamespacedName)
+	logRmq := r.Log.WithValues("RabbitmqCreate", req.NamespacedName)
 	logRmq.Info("Handling Create RabbitMQReconciler ")
 
 	instance, err := getRabbitMQInstanceResource(r.Recorder, r.Client, req)
@@ -63,7 +63,7 @@ func (r *RabbitMQReconcilerCreate) Reconcile(req ctrl.Request) (ctrl.Result, err
 	if err != nil && errors.IsNotFound(err) {
 		service := &corev1.Service{}
 
-		if instance.Spec.ServiceDefinition == scalingv1.Internal {
+		if instance.Spec.ServiceDefinition == opv1alpha.Internal {
 			serv, errSrv := newService(instance, r)
 			errSrv = r.Create(context.TODO(), serv.DeepCopy())
 			if errSrv != nil && errors.IsAlreadyExists(errSrv) == false {
@@ -117,7 +117,7 @@ func (r *RabbitMQReconcilerCreate) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	c := ctrl.NewControllerManagedBy(mgr)
-	return c.For(&scalingv1.RabbitMQ{}).
+	return c.For(&opv1alpha.RabbitMQ{}).
 		Named("RabbitMQCreate").
 		WithEventFilter(p).
 		Complete(r)

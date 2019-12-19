@@ -60,15 +60,23 @@ type CheckProbe struct {
 	TimeoutSeconds      int32 `json:"timeoutSeconds"`
 }
 
+type PersistentVolumeClaimSpec struct {
+	StorageClass string                          `json:"storageClass"`
+	Name         string                          `json:"name"`
+	AccessModes  []v1.PersistentVolumeAccessMode `json:"accessModes"`
+	Resources    v1.ResourceRequirements         `json:"resources"`
+}
+
 // RabbitMQSpec defines the desired state of RabbitMQ
 type RabbitMQSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	// Template v1.StatefulSet `json:"template"`
-	Replicas          int32             `json:"replicas"`
-	Template          TemplateSpec      `json:"template,omitempty"`
-	ServiceDefinition ServiceDefinition `json:"serviceDefinition"`
-	ConfigMap         string            `json:"configMap"`
+	Replicas          int32                     `json:"replicas"`
+	Template          TemplateSpec              `json:"template,omitempty"`
+	ServiceDefinition ServiceDefinition         `json:"serviceDefinition"`
+	ConfigMap         string                    `json:"configMap"`
+	PersistentVolume  PersistentVolumeClaimSpec `json:"persistentVolume"`
 }
 
 // RabbitMQStatus defines the observed state of RabbitMQ

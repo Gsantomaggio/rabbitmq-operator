@@ -16,6 +16,18 @@ endif
 
 all: manager
 
+
+# Run Tests with cover
+cover_travis: generate fmt vet manifests
+	go get golang.org/x/tools/cmd/cover
+	go get github.com/mattn/goveralls
+	go test ./... -covermode=count -coverprofile=coverage.out
+	$$(go env GOPATH | awk 'BEGIN{FS=":"} {print $$1}')/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $$COVERALLS_TOKEN
+
+# Run Tests with cover
+cover: test
+	go tool cover -html=cover.out
+
 # Run tests
 test: generate fmt vet manifests
 	go test ./... -coverprofile cover.out
