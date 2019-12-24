@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
+	opv1alpha "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -95,7 +95,7 @@ func (r *RabbitMQReconcilerUpdate) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	c := ctrl.NewControllerManagedBy(mgr)
-	return c.For(&scalingv1.RabbitMQ{}).
+	return c.For(&opv1alpha.RabbitMQ{}).
 		Named("RabbitMQUpdate").
 		WithEventFilter(p).
 		Complete(r)

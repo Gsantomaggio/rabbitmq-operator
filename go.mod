@@ -4,8 +4,10 @@ go 1.13
 
 require (
 	github.com/go-logr/logr v0.1.0
+	github.com/mattn/goveralls v0.0.4 // indirect
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.5.0
+	golang.org/x/tools v0.0.0-20191223181704-8c5978f193d4 // indirect
 	google.golang.org/appengine v1.5.0
 	k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
 	k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655

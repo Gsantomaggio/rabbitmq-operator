@@ -6,6 +6,13 @@ spec:
   replicas: 3
   serviceDefinition: Internal
   configMap: rabbitmq-config        
+  persistentVolume:
+    name: data
+    accessModes: [ "ReadWriteOnce" ]
+    storageClass: "standard"
+    resources:
+      requests:
+        storage: 1Gi
   template:
     spec:
       contaniers:
