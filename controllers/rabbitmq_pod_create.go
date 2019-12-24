@@ -30,7 +30,9 @@ func newService(cr *opv1alpha.RabbitMQ, r *RabbitMQReconcilerCreate) (*corev1.Se
 			Selector:  labels,
 		},
 	}
-	controllerutil.SetControllerReference(cr, service, r.Scheme)
+	if r != nil {
+		controllerutil.SetControllerReference(cr, service, r.Scheme)
+	}
 	return service, nil
 }
 
@@ -79,6 +81,7 @@ func configureVolumesMap(cr *opv1alpha.RabbitMQ) []v1.VolumeMount {
 
 func configureReadinessProbe(cr *opv1alpha.RabbitMQ) *v1.Probe {
 	return &v1.Probe{
+		Handler:             configureNessHandler(),
 		PeriodSeconds:       cr.Spec.Template.Spec.Contaniers.ReadinessProbe.PeriodSeconds,
 		TimeoutSeconds:      cr.Spec.Template.Spec.Contaniers.ReadinessProbe.TimeoutSeconds,
 		FailureThreshold:    6,
@@ -86,8 +89,9 @@ func configureReadinessProbe(cr *opv1alpha.RabbitMQ) *v1.Probe {
 	}
 }
 
-func configurelivenessProbe(cr *opv1alpha.RabbitMQ) *v1.Probe {
+func configureLivenessProbe(cr *opv1alpha.RabbitMQ) *v1.Probe {
 	return &v1.Probe{
+		Handler:             configureNessHandler(),
 		PeriodSeconds:       cr.Spec.Template.Spec.Contaniers.LivenessProbe.PeriodSeconds,
 		TimeoutSeconds:      cr.Spec.Template.Spec.Contaniers.LivenessProbe.TimeoutSeconds,
 		FailureThreshold:    6,
@@ -123,28 +127,95 @@ func configureVolumes(cr *opv1alpha.RabbitMQ) []v1.Volume {
 	return Volumes
 }
 
+func configureEnvVariables(crd *opv1alpha.RabbitMQ, s *corev1.Service) []v1.EnvVar {
+	Env := []v1.EnvVar{
+		v1.EnvVar{
+			Name: "MY_POD_NAME",
+			ValueFrom: &v1.EnvVarSource{
+				FieldRef: &v1.ObjectFieldSelector{
+					APIVersion: "v1",
+					FieldPath:  "metadata.name",
+				},
+			},
+		},
+		v1.EnvVar{
+			Name: "MY_POD_NAMESPACE",
+			ValueFrom: &v1.EnvVarSource{
+				FieldRef: &v1.ObjectFieldSelector{
+					APIVersion: "v1",
+					FieldPath:  "metadata.namespace",
+				},
+			},
+		},
+
+		v1.EnvVar{
+			Name:  "RABBITMQ_USE_LONGNAME",
+			Value: "true",
+		},
+		v1.EnvVar{
+			Name:  "K8S_SERVICE_NAME",
+			Value: s.Name,
+		},
+		v1.EnvVar{
+			Name:  "RABBITMQ_NODENAME",
+			Value: fmt.Sprintf("rabbit@%s.%s.%s.svc.cluster.local", "$(MY_POD_NAME)", "$(K8S_SERVICE_NAME)", "$(MY_POD_NAMESPACE)"),
+		},
+		v1.EnvVar{
+			Name:  "K8S_HOSTNAME_SUFFIX",
+			Value: fmt.Sprintf(".%s.%s.svc.cluster.local", crd.Name, crd.Namespace),
+		},
+		v1.EnvVar{
+			Name:  "RABBITMQ_ERLANG_COOKIE",
+			Value: "here_need_a_secret",
+		},
+	}
+
+	return Env
+
+}
+
+func configureNessHandler() v1.Handler {
+	commandRMQ := []string{"rabbitmq-diagnostics", "status"}
+	nessProbeHandler := v1.Handler{
+		Exec: &v1.ExecAction{
+			Command: commandRMQ,
+		},
+	}
+	return nessProbeHandler
+}
+
+func configureContaniers(crd *opv1alpha.RabbitMQ, s *corev1.Service) []corev1.Container {
+	containers := []corev1.Container{
+		corev1.Container{
+			Name:            crd.Spec.Template.Spec.Contaniers.Name,
+			Image:           crd.Spec.Template.Spec.Contaniers.Image,
+			ReadinessProbe:  configureReadinessProbe(crd),
+			LivenessProbe:   configureLivenessProbe(crd),
+			ImagePullPolicy: crd.Spec.Template.Spec.Contaniers.ImagePullPolicy,
+			VolumeMounts:    configureVolumesMap(crd),
+			Env:             configureEnvVariables(crd, s),
+		},
+	}
+	return containers
+}
+
+func configurePodTemplateSpec(crd *opv1alpha.RabbitMQ, s *corev1.Service) corev1.PodTemplateSpec {
+
+	template := corev1.PodTemplateSpec{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: crd.ObjectMeta.Labels,
+		},
+		Spec: corev1.PodSpec{
+			TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
+			Volumes:                       configureVolumes(crd),
+			Containers:                    configureContaniers(crd, s),
+		},
+	}
+	return template
+}
+
 func createStatefulSet(cr *opv1alpha.RabbitMQ, r *RabbitMQReconcilerCreate, s *corev1.Service) (*appsv1.StatefulSet, error) {
 	labels := cr.ObjectMeta.Labels
-	replicas := &cr.Spec.Replicas
-	commandRMQ := []string{"rabbitmq-diagnostics", "status"}
-
-	readinessProbeHandler := v1.Handler{
-		Exec: &v1.ExecAction{
-			Command: commandRMQ,
-		},
-	}
-
-	readinessProbe := configureReadinessProbe(cr)
-	readinessProbe.Handler = readinessProbeHandler
-
-	livenessProbeHandler := v1.Handler{
-		Exec: &v1.ExecAction{
-			Command: commandRMQ,
-		},
-	}
-
-	livenessProbe := configurelivenessProbe(cr)
-	livenessProbe.Handler = livenessProbeHandler
 
 	statefulset := &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -159,71 +230,13 @@ func createStatefulSet(cr *opv1alpha.RabbitMQ, r *RabbitMQReconcilerCreate, s *c
 		Spec: appsv1.StatefulSetSpec{
 			Selector:             labelSelector(labels),
 			ServiceName:          cr.Name,
-			Replicas:             replicas,
+			Replicas:             &cr.Spec.Replicas,
 			VolumeClaimTemplates: ConfigurePersistentVolumes(cr),
-			Template: corev1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels: labels,
-				},
-				Spec: corev1.PodSpec{
-					TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
-					Volumes:                       configureVolumes(cr),
-					Containers: []corev1.Container{
-						corev1.Container{
-							Name:            cr.Spec.Template.Spec.Contaniers.Name,
-							Image:           cr.Spec.Template.Spec.Contaniers.Image,
-							LivenessProbe:   livenessProbe,
-							ReadinessProbe:  readinessProbe,
-							ImagePullPolicy: cr.Spec.Template.Spec.Contaniers.ImagePullPolicy,
-							VolumeMounts:    configureVolumesMap(cr),
-							Env: []v1.EnvVar{
-								v1.EnvVar{
-									Name: "MY_POD_NAME",
-									ValueFrom: &v1.EnvVarSource{
-										FieldRef: &v1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "metadata.name",
-										},
-									},
-								},
-								v1.EnvVar{
-									Name: "MY_POD_NAMESPACE",
-									ValueFrom: &v1.EnvVarSource{
-										FieldRef: &v1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "metadata.namespace",
-										},
-									},
-								},
-
-								v1.EnvVar{
-									Name:  "RABBITMQ_USE_LONGNAME",
-									Value: "true",
-								},
-								v1.EnvVar{
-									Name:  "K8S_SERVICE_NAME",
-									Value: s.Name,
-								},
-								v1.EnvVar{
-									Name:  "RABBITMQ_NODENAME",
-									Value: fmt.Sprintf("rabbit@%s.%s.%s.svc.cluster.local", "$(MY_POD_NAME)", "$(K8S_SERVICE_NAME)", "$(MY_POD_NAMESPACE)"),
-								},
-								v1.EnvVar{
-									Name:  "K8S_HOSTNAME_SUFFIX",
-									Value: fmt.Sprintf(".%s.%s.svc.cluster.local", cr.Name, cr.Namespace),
-								},
-								v1.EnvVar{
-									Name:  "RABBITMQ_ERLANG_COOKIE",
-									Value: "here_need_a_secret",
-								},
-							},
-						},
-					},
-				},
-			},
+			Template:             configurePodTemplateSpec(cr, s),
 		},
 	}
-
-	controllerutil.SetControllerReference(cr, statefulset, r.Scheme)
+	if r != nil {
+		controllerutil.SetControllerReference(cr, statefulset, r.Scheme)
+	}
 	return statefulset, nil
 }

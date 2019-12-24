@@ -17,7 +17,7 @@ spec:
     spec:
       contaniers:
         name: rabbitmq-k8s
-        image: rabbitmq:3.8.1
+        image: rabbitmq:3.8
         imagePullPolicy: IfNotPresent 
         livenessProbe:
           initialDelaySeconds: 30
