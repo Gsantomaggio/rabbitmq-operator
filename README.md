@@ -97,16 +97,16 @@ make
 
 Describe:
 ```
-kubectl describe rabbitmq
+kubectl describe rabbitmq --all-namespaces
 ```
 
 Running Pods:
 ```
-$ kubectl get pods
-NAME            READY   STATUS    RESTARTS   AGE
-rabbitmq-op-0   1/1     Running   0          4m51s
-rabbitmq-op-1   1/1     Running   0          3m45s
-rabbitmq-op-2   1/1     Running   0          2m32s
+kubectl get pods --all-namespaces | grep rabbitmq
+NAMESPACE                  NAME                                                   READY   STATUS    RESTARTS   AGE
+ns-developing              rabbitmq-op-developing-0                               1/1     Running   0          22m
+ns-developing              rabbitmq-op-developing-1                               1/1     Running   0          20m
+rabbitmq-operator-system   rabbitmq-operator-controller-manager-6b695f98d-jfk7j   2/2     Running   0          23m
 ```
 
 
