@@ -9,7 +9,7 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 
 * Install the operator from Docker-Hub:
 ```
-kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.4-alpha/rabbitmq-operator_latest.yaml
+kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.4-alpha/rabbitmq-operator-lastest.yaml
 ```
 
 See the [Check the Installation](#check-the-installation) section to test it
