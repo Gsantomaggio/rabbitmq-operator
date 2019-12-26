@@ -23,6 +23,7 @@ import (
 	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -42,7 +43,7 @@ func getRabbitMQInstanceResource(eventRecorder record.EventRecorder,
 	client client.Client, req ctrl.Request) (*scalingv1.RabbitMQ, error) {
 
 	instance := scalingv1.NewRabbitMQStruct()
-	eventRecorder.Event(instance, "Normal", "Create",
+	sendEvent(nil, instance, "Normal", "Create",
 		fmt.Sprintf("Reconcile Create  %s/%s", req.Namespace, req.Name))
 
 	err := client.Get(context.TODO(), req.NamespacedName, instance)
@@ -52,4 +53,11 @@ func getRabbitMQInstanceResource(eventRecorder record.EventRecorder,
 	}
 
 	return instance, nil
+}
+
+func sendEvent(eventRecorder record.EventRecorder, object runtime.Object, eventtype, reason, message string) {
+	// added this condition for tests cases
+	if eventRecorder != nil {
+		eventRecorder.Event(object, eventtype, reason, message)
+	}
 }
