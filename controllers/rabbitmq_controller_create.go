@@ -88,7 +88,7 @@ func (r *RabbitMQReconcilerCreate) Reconcile(req ctrl.Request) (ctrl.Result, err
 			return ctrl.Result{}, err
 		}
 
-		r.Recorder.Event(instance, "Normal", "Creating",
+		sendEvent(r.Recorder, instance, "Normal", "Creating",
 			fmt.Sprintf("Creating Statefulset %s/%s", dep.Namespace, dep.Name))
 		// Deployment created successfully - return and requeue
 		// NOTE: that the requeue is made with the purpose to provide the deployment object for the next step to ensure the deployment size is the same as the spec.
