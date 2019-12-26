@@ -12,13 +12,13 @@ Kubernetes Operator to handle the RabbitMQ deploy.
 kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.4-alpha/rabbitmq-operator-lastest.yaml
 ```
 
-See the [Check the Installation](#check-the-installation) section to test it
-
 
 ### Deploy RabbitMQ with the Operator
 
 Inside the directory `config/samples` you can find the deploy examples.
-The examples are built with [`kustomize`](https://github.com/kubernetes-sigs/kustomize), but you don't have to install anything, the command `kubectl apply -k`  already uses kustomize.
+The examples are built with [`kustomize`](https://github.com/kubernetes-sigs/kustomize).
+
+Use the command: `kubectl apply -k`  to deploy it.
 
 #### Localhost developing
 
