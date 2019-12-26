@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,32 +40,112 @@ var _ = Describe("RabbitMQ Controller", func() {
 	})
 
 	Context("Reconcile", func() {
-		It("Should create successfully", func() {
 
-			key := types.NamespacedName{
-				Name:      name,
-				Namespace: namespace,
-			}
-
-			rabbitmqScaling := &scalingv1.RabbitMQ{
+		It("Check the internal/external service ", func() {
+			rabbitmqInternalService := &scalingv1.RabbitMQ{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      key.Name,
-					Namespace: key.Namespace,
+					Name:      name,
+					Namespace: namespace,
+				},
+				Spec: scalingv1.RabbitMQSpec{
+					ServiceDefinition: scalingv1.Internal,
+				}}
+
+			s := scheme.Scheme
+			s.AddKnownTypes(scalingv1.GroupVersion, rabbitmqInternalService)
+
+			// Objects to track in the fake client.
+			objs := []runtime.Object{rabbitmqInternalService}
+			cl := fake.NewFakeClient(objs...)
+
+			r := &RabbitMQReconcilerCreate{
+				Client:   cl,
+				Log:      ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
+				Scheme:   s,
+				Recorder: nil}
+			req := reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      name,
+					Namespace: namespace,
+				},
+			}
+			_, err := r.Reconcile(req)
+
+			Ω(err).Should(BeNil())
+
+			service := &corev1.Service{}
+			err = r.Get(context.TODO(),
+				types.NamespacedName{Name: req.Name, Namespace: req.Namespace},
+				service)
+
+			Ω(err).Should(BeNil())
+
+			dep := &appsv1.StatefulSet{}
+			err = r.Get(context.TODO(), req.NamespacedName, dep)
+			err = r.Delete(context.TODO(), dep)
+			Ω(err).Should(BeNil())
+
+			rabbitmqExternalService := &scalingv1.RabbitMQ{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					Namespace: namespace,
+				},
+				Spec: scalingv1.RabbitMQSpec{
+					ServiceDefinition: scalingv1.External,
+				}}
+
+			s.AddKnownTypes(scalingv1.GroupVersion, rabbitmqExternalService)
+
+			// Objects to track in the fake client.
+			objs = []runtime.Object{rabbitmqExternalService}
+			cl = fake.NewFakeClient(objs...)
+
+			r = &RabbitMQReconcilerCreate{
+				Client:   cl,
+				Log:      ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
+				Scheme:   s,
+				Recorder: nil}
+			req = reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      name,
+					Namespace: namespace,
+				},
+			}
+			_, err = r.Reconcile(req)
+
+			Ω(err).Should(BeNil())
+
+			service = &corev1.Service{}
+			err = r.Get(context.TODO(),
+				types.NamespacedName{Name: req.Name, Namespace: req.Namespace},
+				service)
+
+			Ω(err).ShouldNot(BeNil())
+
+		})
+
+		It("Check the Initial Scaling Value", func() {
+			rabbitmqInternalService := &scalingv1.RabbitMQ{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					Namespace: namespace,
 				},
 				Spec: scalingv1.RabbitMQSpec{
 					Replicas: replicas,
 				}}
 
 			s := scheme.Scheme
-			s.AddKnownTypes(scalingv1.GroupVersion, rabbitmqScaling)
+			s.AddKnownTypes(scalingv1.GroupVersion, rabbitmqInternalService)
 
 			// Objects to track in the fake client.
-			objs := []runtime.Object{rabbitmqScaling}
-
+			objs := []runtime.Object{rabbitmqInternalService}
 			cl := fake.NewFakeClient(objs...)
 
-			r := &RabbitMQReconcilerCreate{Client: cl, Log: ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
-				Scheme: s, Recorder: nil}
+			r := &RabbitMQReconcilerCreate{
+				Client:   cl,
+				Log:      ctrl.Log.WithName("controllers").WithName("RabbitMQ"),
+				Scheme:   s,
+				Recorder: nil}
 			req := reconcile.Request{
 				NamespacedName: types.NamespacedName{
 					Name:      name,
@@ -79,9 +160,13 @@ var _ = Describe("RabbitMQ Controller", func() {
 			dep := &appsv1.StatefulSet{}
 			err = r.Get(context.TODO(), req.NamespacedName, dep)
 			Ω(err).Should(BeNil())
-			// Check if the quantity of Replicas for this deployment is equals the specification
+			// Check if the quantity of Replicas for this StatefulSet is equals the specification
 			dsize := *dep.Spec.Replicas
 			Ω(dsize).Should(Equal(replicas))
+
+			err = r.Delete(context.TODO(), dep)
+			Ω(err).Should(BeNil())
+
 		})
 	})
 	// Add Tests for OpenAPI validation (or additonal CRD features) specified in
