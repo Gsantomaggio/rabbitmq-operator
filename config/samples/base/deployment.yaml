@@ -9,7 +9,7 @@ spec:
   persistentVolume:
     name: data
     accessModes: [ "ReadWriteOnce" ]
-    storageClass: "standard"
+    storageClass: ""
     resources:
       requests:
         storage: 1Gi

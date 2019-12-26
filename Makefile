@@ -1,7 +1,7 @@
 
 # Image URL to use all building/pushing image targets
 IMG_BASE ?= rabbitmq-operator
-IMG ?= ${IMG_BASE}:4
+IMG ?= ${IMG_BASE}:5
 
 GIT_HUB_IMG ?= docker.pkg.github.com/gsantomaggio/rabbitmq-operator/${IMG}
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
@@ -84,8 +84,8 @@ docker-push-on-dockerhub:
 	docker tag ${IMG_BASE}:latest  gsantomaggio/${IMG_BASE}:latest
 	docker push gsantomaggio/${IMG_BASE}:latest
 	
-	# cd config/manager && kustomize edit set image controller=gsantomaggio/${IMG} 
-	# kustomize build config/default  > deploy/operator/rabbitmq-operator_tag.yaml
+    cd config/manager && kustomize edit set image controller=gsantomaggio/${IMG} 
+	kustomize build config/default > rabbitmq-operator-lastest.yaml
 	
 	# cd config/manager && kustomize edit set image controller=gsantomaggio/${IMG_BASE}:latest 
 	# kustomize build config/default  > deploy/operator/rabbitmq-operator_latest.yaml

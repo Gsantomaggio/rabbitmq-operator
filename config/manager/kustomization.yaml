@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: gsantomaggio/rabbitmq-operator
-  newTag: latest
+  newTag: "5"

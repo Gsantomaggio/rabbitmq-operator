@@ -103,7 +103,7 @@ func configureVolumes(cr *opv1alpha.RabbitMQ) []v1.Volume {
 	var mode int32 = 0777
 	Volumes := []v1.Volume{
 		v1.Volume{
-			Name: "-volume",
+			Name: "config-volume",
 			VolumeSource: v1.VolumeSource{
 				ConfigMap: &v1.ConfigMapVolumeSource{
 					DefaultMode: &mode,

@@ -271,7 +271,7 @@ var _ = Describe("RabbitMQ Pod Create ", func() {
 			crd := scalingv1alpha.NewRabbitMQStruct()
 			res := []v1.Volume{
 				v1.Volume{
-					Name: "-volume",
+					Name: "config-volume",
 					VolumeSource: v1.VolumeSource{
 						ConfigMap: &v1.ConfigMapVolumeSource{
 							DefaultMode: &mode,
