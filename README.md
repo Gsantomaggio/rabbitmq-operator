@@ -1,6 +1,6 @@
 # RabbitMQ Kubernetes Operator
 
-[![Build Status](https://travis-ci.org/Gsantomaggio/rabbitmq-operator.svg?branch=master)](https://travis-ci.org/Gsantomaggio/rabbitmq-operator) [![Coverage Status](https://coveralls.io/repos/github/Gsantomaggio/rabbitmq-operator/badge.svg?branch=master)](https://coveralls.io/github/Gsantomaggio/rabbitmq-operator?branch=master)
+[![Build Status](https://travis-ci.org/Gsantomaggio/rabbitmq-operator.svg?branch=master)](https://travis-ci.org/Gsantomaggio/rabbitmq-operator) [![Coverage Status](https://coveralls.io/repos/github/Gsantomaggio/rabbitmq-operator/badge.png?branch=master)](https://coveralls.io/github/Gsantomaggio/rabbitmq-operator?branch=master)
 
 
 Kubernetes Operator to handle the RabbitMQ deploy.
