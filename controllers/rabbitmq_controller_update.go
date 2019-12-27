@@ -55,12 +55,16 @@ func (r *RabbitMQReconcilerUpdate) Reconcile(req ctrl.Request) (ctrl.Result, err
 
 	statefulset := &appsv1.StatefulSet{}
 	err = r.Get(context.TODO(),
-		types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace},
+		types.NamespacedName{Name: req.Name, Namespace: req.Namespace},
 		statefulset)
+
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	size := instance.Spec.Replicas
 	if size != *statefulset.Spec.Replicas {
-		r.Recorder.Event(instance, "Normal", "Scaling",
+		sendEvent(r.Recorder, instance, "Normal", "Scaling",
 			fmt.Sprintf("Scaling Statefulset  %s/%s, from %d to %d",
 				req.Namespace, req.Name, *statefulset.Spec.Replicas, size))
 
@@ -74,7 +78,7 @@ func (r *RabbitMQReconcilerUpdate) Reconcile(req ctrl.Request) (ctrl.Result, err
 	}
 
 	if err != nil && errors.IsAlreadyExists(err) {
-		return ctrl.Result{}, nil
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil

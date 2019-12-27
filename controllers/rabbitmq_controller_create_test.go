@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	scalingv1 "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
+	scalingv1alpha "github.com/gsantomaggio/rabbitmq-operator/api/v1alpha"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -42,17 +42,17 @@ var _ = Describe("RabbitMQ Controller", func() {
 	Context("Reconcile", func() {
 
 		It("Check the internal/external service ", func() {
-			rabbitmqInternalService := &scalingv1.RabbitMQ{
+			rabbitmqInternalService := &scalingv1alpha.RabbitMQ{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      name,
 					Namespace: namespace,
 				},
-				Spec: scalingv1.RabbitMQSpec{
-					ServiceDefinition: scalingv1.Internal,
+				Spec: scalingv1alpha.RabbitMQSpec{
+					ServiceDefinition: scalingv1alpha.Internal,
 				}}
 
 			s := scheme.Scheme
-			s.AddKnownTypes(scalingv1.GroupVersion, rabbitmqInternalService)
+			s.AddKnownTypes(scalingv1alpha.GroupVersion, rabbitmqInternalService)
 
 			// Objects to track in the fake client.
 			objs := []runtime.Object{rabbitmqInternalService}
@@ -85,16 +85,16 @@ var _ = Describe("RabbitMQ Controller", func() {
 			err = r.Delete(context.TODO(), dep)
 			Ω(err).Should(BeNil())
 
-			rabbitmqExternalService := &scalingv1.RabbitMQ{
+			rabbitmqExternalService := &scalingv1alpha.RabbitMQ{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      name,
 					Namespace: namespace,
 				},
-				Spec: scalingv1.RabbitMQSpec{
-					ServiceDefinition: scalingv1.External,
+				Spec: scalingv1alpha.RabbitMQSpec{
+					ServiceDefinition: scalingv1alpha.External,
 				}}
 
-			s.AddKnownTypes(scalingv1.GroupVersion, rabbitmqExternalService)
+			s.AddKnownTypes(scalingv1alpha.GroupVersion, rabbitmqExternalService)
 
 			// Objects to track in the fake client.
 			objs = []runtime.Object{rabbitmqExternalService}
@@ -125,17 +125,17 @@ var _ = Describe("RabbitMQ Controller", func() {
 		})
 
 		It("Check the Initial Scaling Value", func() {
-			rabbitmqInternalService := &scalingv1.RabbitMQ{
+			rabbitmqInternalService := &scalingv1alpha.RabbitMQ{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      name,
 					Namespace: namespace,
 				},
-				Spec: scalingv1.RabbitMQSpec{
+				Spec: scalingv1alpha.RabbitMQSpec{
 					Replicas: replicas,
 				}}
 
 			s := scheme.Scheme
-			s.AddKnownTypes(scalingv1.GroupVersion, rabbitmqInternalService)
+			s.AddKnownTypes(scalingv1alpha.GroupVersion, rabbitmqInternalService)
 
 			// Objects to track in the fake client.
 			objs := []runtime.Object{rabbitmqInternalService}
@@ -181,31 +181,31 @@ var _ = Describe("RabbitMQ Controller", func() {
 				Namespace: "default",
 			}
 
-			created := &scalingv1.RabbitMQ{
+			created := &scalingv1alpha.RabbitMQ{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      key.Name,
 					Namespace: key.Namespace,
 				},
-				Spec: scalingv1.RabbitMQSpec{
+				Spec: scalingv1alpha.RabbitMQSpec{
 					Replicas:          3,
 					ConfigMap:         "TEST",
 					ServiceDefinition: "Internal",
-					PersistentVolume: scalingv1.PersistentVolumeClaimSpec{
+					PersistentVolume: scalingv1alpha.PersistentVolumeClaimSpec{
 						StorageClass: "standard",
 						AccessModes:  []v1.PersistentVolumeAccessMode{"ReadWriteOnce"},
 					},
-					Template: scalingv1.TemplateSpec{
-						Spec: scalingv1.ContainerSpec{
-							Contaniers: scalingv1.ContainerDetailsSpec{
+					Template: scalingv1alpha.TemplateSpec{
+						Spec: scalingv1alpha.ContainerSpec{
+							Contaniers: scalingv1alpha.ContainerDetailsSpec{
 								Name:            "rabbtimq",
 								Image:           "rabbitmq",
 								ImagePullPolicy: "ifNotPreset",
-								LivenessProbe: scalingv1.CheckProbe{
+								LivenessProbe: scalingv1alpha.CheckProbe{
 									InitialDelaySeconds: 60,
 									TimeoutSeconds:      10,
 									PeriodSeconds:       30,
 								},
-								ReadinessProbe: scalingv1.CheckProbe{
+								ReadinessProbe: scalingv1alpha.CheckProbe{
 									InitialDelaySeconds: 60,
 									TimeoutSeconds:      10,
 									PeriodSeconds:       30,
@@ -214,26 +214,26 @@ var _ = Describe("RabbitMQ Controller", func() {
 						},
 					},
 				},
-				Status: scalingv1.RabbitMQStatus{},
+				Status: scalingv1alpha.RabbitMQStatus{},
 			}
 
 			Expect(k8sClient.Create(context.Background(), created)).Should(Succeed())
 			By("Expecting submitted")
-			failed := scalingv1.NewRabbitMQStruct()
+			failed := scalingv1alpha.NewRabbitMQStruct()
 
 			Eventually(func() bool {
 				k8sClient.Get(context.Background(), key, failed)
 				return failed.ObjectMeta.Name == "invalid"
 			}, timeout, interval).Should(BeFalse())
 
-			success := scalingv1.NewRabbitMQStruct()
+			success := scalingv1alpha.NewRabbitMQStruct()
 			Eventually(func() bool {
 				k8sClient.Get(context.Background(), key, success)
 				return success.ObjectMeta.Name == "rabbitmq"
 			}, timeout, interval).Should(BeTrue())
 
 			// Update
-			updated := scalingv1.NewRabbitMQStruct()
+			updated := scalingv1alpha.NewRabbitMQStruct()
 			Expect(k8sClient.Get(context.Background(), key, updated)).Should(Succeed())
 
 			Expect(k8sClient.Update(context.Background(), updated)).Should(Succeed())
@@ -241,14 +241,14 @@ var _ = Describe("RabbitMQ Controller", func() {
 			// Delete
 			By("Expecting to delete successfully")
 			Eventually(func() error {
-				f := scalingv1.NewRabbitMQStruct()
+				f := scalingv1alpha.NewRabbitMQStruct()
 				k8sClient.Get(context.Background(), key, f)
 				return k8sClient.Delete(context.Background(), f)
 			}, timeout, interval).Should(Succeed())
 
 			By("Expecting to delete finish")
 			Eventually(func() error {
-				f := scalingv1.NewRabbitMQStruct()
+				f := scalingv1alpha.NewRabbitMQStruct()
 				return k8sClient.Get(context.Background(), key, f)
 			}, timeout, interval).ShouldNot(Succeed())
 		})
