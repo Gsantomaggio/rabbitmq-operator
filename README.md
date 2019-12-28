@@ -1,9 +1,25 @@
 # RabbitMQ Kubernetes Operator
 
-[![Build Status](https://travis-ci.org/Gsantomaggio/rabbitmq-operator.svg?branch=master)](https://travis-ci.org/Gsantomaggio/rabbitmq-operator) [![Coverage Status](https://coveralls.io/repos/github/Gsantomaggio/rabbitmq-operator/badge.png?branch=master)](https://coveralls.io/github/Gsantomaggio/rabbitmq-operator?branch=master)
+[![Build Status](https://travis-ci.org/Gsantomaggio/rabbitmq-operator.svg?branch=master)](https://travis-ci.org/Gsantomaggio/rabbitmq-operator) [![Coverage Status](https://coveralls.io/repos/github/Gsantomaggio/rabbitmq-operator/badge.svg?branch=master)](https://coveralls.io/github/Gsantomaggio/rabbitmq-operator?branch=master)
 
+The easier way to deploy a RabbitMQ Cluster on Kubernetes.
 
-Kubernetes Operator to handle the RabbitMQ deploy.
+Current Features:
+ * Automatic RabbitMQ service creation 
+ * Configure the right policies to  run the Cluster
+ * Easy `storage-class` configuration for persistent the data
+
+Work in progress features:
+* Handle the node remove from the cluster, avoiding to lose the the messages
+
+### Parameters
+
+|  Name | Description | Values | Default 
+| ------------ | ------------ | ------------ | ------------ |
+|   `replicas`| Number of the nodes  |  Integer (1 to x)  | 1
+|  `serviceDefinition` | Service creating   | `Internal` = Auto create the service `External` = it  does not crete the service | `Internal`
+|`persistentVolume.storageClass` | k8s [Storage Class ](https://kubernetes.io/docs/concepts/storage/storage-classes/ "Storage Class ")definition,  if `""` won't use the `persistentVolume` configuration | `string` | `""` |
+|`configMap`| Config Map name |`string` |`rabbitmq-config` 
 
 ### Install the RabbitMQ Operator 
 
@@ -27,7 +43,7 @@ For developing purpose you can use `config/samples/overlays/developing`, so:
 ```bash
 kubectl apply -k config/samples/overlays/developing
 ```
-It creates a custom Service with `nodePort` configuration, so it can be used in local configuration without load-balancers
+By setting `serviceDefinition = External` It creates a custom Service with `nodePort` configuration, so it can be used in local configuration without load-balancers
 
 
 #### Standard deploy
