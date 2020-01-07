@@ -1,0 +1,87 @@
+apiVersion: scaling.queues/v1alpha
+kind: RabbitMQ
+metadata:
+   # name: {{ include "helm.fullname" . }}
+  name: rabbitmq-op
+  labels:
+     app: rabbitmq-operator
+     rabbitmq_cr: rabbitmq          
+spec:
+  replicas: {{ .Values.replicaCount }}
+  serviceDefinition: Internal
+  configMap: rabbitmq-config
+  persistentVolume:
+    name: data
+    accessModes: [ "ReadWriteOnce" ]
+    storageClass: ""
+    resources:
+      requests:
+        storage: 1Gi
+  template:
+    spec:
+      contaniers:
+        name: rabbitmq-k8s
+        image: rabbitmq:3.8
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          timeoutSeconds: 15
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 15
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+data:
+  enabled_plugins: |
+      [rabbitmq_management,rabbitmq_peer_discovery_k8s].
+
+  rabbitmq.conf: |
+      ## Cluster formation. See https://www.rabbitmq.com/cluster-formation.html to learn more.
+      cluster_formation.peer_discovery_backend  = rabbit_peer_discovery_k8s
+      cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
+      ## Should RabbitMQ node name be computed from the pod's hostname or IP address?
+      ## IP addresses are not stable, so using [stable] hostnames is recommended when possible.
+      ## Set to "hostname" to use pod hostnames.
+      ## When this value is changed, so should the variable used to set the RABBITMQ_NODENAME
+      ## environment variable.
+      log.file.level = debug
+      log.console = true
+      log.console.level = debug
+      cluster_formation.k8s.address_type = hostname
+      ## How often should node cleanup checks run?
+      cluster_formation.node_cleanup.interval = 30
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: endpoint-reader
+ 
+rules:
+- apiGroups: 
+    - ""
+  resources: 
+    - endpoints
+    - events
+    - services
+  verbs: 
+    - get
+    - list
+    - create
+    - watch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: endpoint-reader
+subjects:
+- kind: ServiceAccount
+  name: default 
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: endpoint-reader

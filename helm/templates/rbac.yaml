@@ -1,0 +1,48 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: helm-reading-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - patch
+  - create
+- apiGroups:
+  - apps
+  - ""
+  resources:
+  - statefulsets
+  - services
+  verbs:
+  - create
+  - list
+  - watch
+- apiGroups:
+  - scaling.queues
+  resources:
+  - rabbitmqs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: helm-reading-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: helm-reading-role
+subjects:
+- kind: ServiceAccount
+  name:  {{ include "helm.fullname" . }}   
+  namespace: rabbitmq-operator-system

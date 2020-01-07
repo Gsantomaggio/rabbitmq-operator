@@ -1,3 +1,4 @@
 - Implement finalizers
-- Implement watcher
+- Implement watcher (done)
 - Metrics
+- Add RabbitMQStatus  
