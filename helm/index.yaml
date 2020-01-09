@@ -9,6 +9,6 @@ entries:
     name: rabbitmq-operator-helm
     type: application
     urls:
-    - https://github.com/Gsantomaggio/rabbitmq-operator/blob/add_helm_deploy_support/helm/rabbitmq-operator-helm-0.1.0.tgz?raw=true 
+    - https://github.com/Gsantomaggio/rabbitmq-operator/raw/add_helm_deploy_support/helm/rabbitmq-operator-helm-0.1.0.tgz 
     version: 0.1.0
 generated: "2020-01-09T14:14:52.317283343+01:00"
