@@ -2,6 +2,7 @@
 docker pull rabbitmq:3.8
 kind load docker-image rabbitmq:3.8
 # kind load docker-image rabbitmq-operator:3
+kind load docker-image gsantomaggio/rabbitmq-operator:5
 
 
 

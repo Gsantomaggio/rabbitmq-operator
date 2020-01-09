@@ -108,7 +108,14 @@ type RabbitMQList struct {
 // NewRabbitMQStruct Init a RabbitMQ struct with default values
 func NewRabbitMQStruct() *RabbitMQ {
 	return &RabbitMQ{
-		Spec:   RabbitMQSpec{},
+		Spec: RabbitMQSpec{
+			Replicas:          1,
+			ServiceDefinition: Internal,
+			ConfigMap:         "rabbitmq-config",
+			PersistentVolume: PersistentVolumeClaimSpec{
+				StorageClass: "",
+			},
+		},
 		Status: RabbitMQStatus{},
 	}
 }
