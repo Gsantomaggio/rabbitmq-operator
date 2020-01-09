@@ -374,7 +374,7 @@ spec:
         - --enable-leader-election
         command:
         - /manager
-        image: gsantomaggio/rabbitmq-operator:0.5 
+        image: gsantomaggio/rabbitmq-operator:0.6 
         name: manager
         resources:
           limits:
