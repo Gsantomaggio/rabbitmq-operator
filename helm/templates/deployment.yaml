@@ -1,28 +1,36 @@
 apiVersion: scaling.queues/v1alpha
 kind: RabbitMQ
 metadata:
-   # name: {{ include "helm.fullname" . }}
   name: rabbitmq-op
   labels:
      app: rabbitmq-operator
      rabbitmq_cr: rabbitmq          
 spec:
   replicas: {{ .Values.replicaCount }}
-  serviceDefinition: Internal
-  configMap: rabbitmq-config
+  serviceDefinition: {{ .Values.serviceDefinition }}
+  configMap: {{ .Values.configMap }}
   persistentVolume:
     name: data
-    accessModes: [ "ReadWriteOnce" ]
-    storageClass: ""
+    accessModes: 
+    {{- range .Values.persistentVolume.accessModes }}
+        - {{ . | quote }}
+    {{- end }}
     resources:
       requests:
-        storage: 1Gi
+        storage: {{ .Values.persistentVolume.storage}}
+   {{- if .Values.persistentVolume.storageClass }}
+   {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+    storageClass: ""
+   {{- else }}
+    storageClass: "{{ .Values.persistentVolume.storageClass }}"
+   {{- end }}
+   {{- end }}
   template:
     spec:
       contaniers:
         name: rabbitmq-k8s
-        image: rabbitmq:3.8
-        imagePullPolicy: IfNotPresent
+        image: {{ .Values.contaniers.image}}
+        imagePullPolicy: {{ .Values.contaniers.imagePullPolicy}}
         livenessProbe:
           initialDelaySeconds: 30
           periodSeconds: 60

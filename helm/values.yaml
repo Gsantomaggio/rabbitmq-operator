@@ -3,15 +3,35 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 3
-installCrds: false
 
 image:
   repository: rabbitmq:3.8
   pullPolicy: IfNotPresent
 
 
-  #operatorImage:
-  #  repository: gsantomaggio/rabbitmq-operator
+# serviceDefinition values:
+# Internal - The operator autocreates the service
+# External - You can define your own service
+# Default: Internal
+serviceDefinition: Internal
+
+
+# configMap values:
+# string - It is the configMap name.  
+# default: "rabbitmq-config"
+configMap: "rabbitmq-config"
+
+
+persistentVolume:
+  accessModes:
+    - ReadWriteOnce
+      #storageClass: "-" 
+  storage: 1Gi
+
+contaniers:
+  image: rabbitmq:3.8 
+  
+  imagePullPolicy: IfNotPresent 
 
 imagePullSecrets: []
 nameOverride: ""
