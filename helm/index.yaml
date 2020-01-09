@@ -3,12 +3,12 @@ entries:
   rabbitmq-operator-helm:
   - apiVersion: v2
     appVersion: "0.6"
-    created: "2020-01-09T16:56:32.5408019+01:00"
+    created: "2020-01-09T17:23:22.10260412+01:00"
     description: Helm for the RabbitMQ Operator
-    digest: ea30eea28646e0196e9935db8ad478a56275f741309a78aef93c52d02072acdf
+    digest: 1f3b9906d127c44ba7154418837500f2feaa13ae2dfaa818607527bb5c949f9f
     name: rabbitmq-operator-helm
     type: application
     urls:
-    - https://github.com/Gsantomaggio/rabbitmq-operator/raw/master/helm/rabbitmq-operator-helm-0.1.6.tgz
-    version: 0.1.6
-generated: "2020-01-09T16:56:32.539862112+01:00"
+    - https://github.com/Gsantomaggio/rabbitmq-operator/raw/master/helm/rabbitmq-operator-helm-0.2.6.tgz
+    version: 0.2.6
+generated: "2020-01-09T17:23:22.101256526+01:00"
