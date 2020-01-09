@@ -52,7 +52,7 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.Logger(true))
-
+	setupLog.Info("RabbitMQ Operator version alpha 0.4")
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
