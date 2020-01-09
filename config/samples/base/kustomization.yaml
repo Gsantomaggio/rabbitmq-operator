@@ -4,6 +4,8 @@ commonLabels:
   app: rabbitmq-operator
   rabbitmq_cr: rabbitmq 
 
+
+
 resources:
 - deployment.yaml
 - deployment_rbac.yaml

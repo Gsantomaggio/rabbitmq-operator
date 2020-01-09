@@ -60,8 +60,9 @@ type CheckProbe struct {
 	TimeoutSeconds      int32 `json:"timeoutSeconds"`
 }
 
+// PersistentVolumeClaimSpec  defines the persistent
 type PersistentVolumeClaimSpec struct {
-	StorageClass string                          `json:"storageClass"`
+	StorageClass string                          `json:"storageClass,omitempty"`
 	Name         string                          `json:"name"`
 	AccessModes  []v1.PersistentVolumeAccessMode `json:"accessModes"`
 	Resources    v1.ResourceRequirements         `json:"resources"`

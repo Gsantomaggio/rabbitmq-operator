@@ -67,7 +67,6 @@ spec:
               - accessModes
               - name
               - resources
-              - storageClass
               type: object
             replicas:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
