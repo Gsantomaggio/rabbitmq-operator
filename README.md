@@ -54,6 +54,30 @@ For the standard purpose you can use `config/samples/overlays/testing`, so:
 kubectl apply -k config/samples/overlays/testing
 ```
 
+### Install the RabbitMQ Operator with [Helm3](https://helm.sh/)
+
+Add the repo:
+```
+ helm repo add alpha https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.6-alpha/
+```
+
+Update the repo list:
+```
+helm repo update
+```
+
+Search the package (optional):
+```
+helm search repo rabbitmq
+NAME                                    CHART VERSION   APP VERSION     DESCRIPTION
+alpha/rabbitmq-operator-helm            0.2.6           0.6             Helm for the RabbitMQ Operator
+```
+
+Install the package:
+```
+helm install  rabbitmq alpha/rabbitmq-operator-helm
+```
+
 
 ## Localhost developing using Kind
 
