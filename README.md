@@ -25,7 +25,7 @@ Work in progress features:
 
 * Install the operator from Docker-Hub:
 ```
-kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.4-alpha/rabbitmq-operator-lastest.yaml
+kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.6-alpha/rabbitmq-operator-lastest.yaml
 ```
 
 
