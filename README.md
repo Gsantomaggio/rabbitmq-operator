@@ -17,7 +17,7 @@ Work in progress features:
 |  Name | Description | Values | Default 
 | ------------ | ------------ | ------------ | ------------ |
 |   `replicas`| Number of the nodes  |  Integer (1 to x)  | 1
-|  `serviceDefinition` | Service creating   | `Internal` = Auto create the service `External` = it  does not crete the service | `Internal`
+|  `serviceDefinition` | Service creating   | `Internal` = Auto create the service `External` = it  does not create the service | `Internal`
 |`persistentVolume.storageClass` | k8s [Storage Class ](https://kubernetes.io/docs/concepts/storage/storage-classes/ "Storage Class ")definition,  if `""` won't use the `persistentVolume` configuration | `string` | `""` |
 |`configMap`| Config Map name |`string` |`rabbitmq-config` 
 
