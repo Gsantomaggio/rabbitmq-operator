@@ -1,7 +1,7 @@
 
 # Image URL to use all building/pushing image targets
 IMG_BASE ?= rabbitmq-operator
-IMG ?= ${IMG_BASE}:5
+IMG ?= ${IMG_BASE}:0.6
 
 GIT_HUB_IMG ?= docker.pkg.github.com/gsantomaggio/rabbitmq-operator/${IMG}
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
