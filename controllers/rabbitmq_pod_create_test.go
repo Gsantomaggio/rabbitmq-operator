@@ -218,7 +218,7 @@ var _ = Describe("RabbitMQ Pod Create ", func() {
 					SubPathExpr:      "",
 				},
 				v1.VolumeMount{
-					Name:             storageClass,
+					Name:             "pvname",
 					ReadOnly:         false,
 					MountPath:        "/var/lib/rabbitmq/",
 					SubPath:          "",

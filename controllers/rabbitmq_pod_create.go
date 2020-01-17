@@ -72,7 +72,7 @@ func configureVolumesMap(cr *opv1alpha.RabbitMQ) []v1.VolumeMount {
 	}
 	if cr.Spec.PersistentVolume.StorageClass != "" {
 		volumeMounts = append(volumeMounts, v1.VolumeMount{
-			Name:      cr.Spec.PersistentVolume.StorageClass,
+			Name:      cr.Spec.PersistentVolume.Name,
 			MountPath: "/var/lib/rabbitmq/",
 		})
 	}
