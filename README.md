@@ -25,7 +25,7 @@ Work in progress features:
 
 * Install the operator from Docker-Hub:
 ```
-kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.6-alpha/rabbitmq-operator-lastest.yaml
+kubectl apply -f https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.7-alpha/rabbitmq-operator-lastest.yaml
 ```
 
 
@@ -58,7 +58,7 @@ kubectl apply -k config/samples/overlays/testing
 
 Add the repo:
 ```
- helm repo add alpha https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.6-alpha/
+ helm repo add alpha https://github.com/Gsantomaggio/rabbitmq-operator/releases/download/v0.7-alpha/
 ```
 
 Update the repo list:
@@ -70,7 +70,7 @@ Search the package (optional):
 ```
 helm search repo rabbitmq
 NAME                                    CHART VERSION   APP VERSION     DESCRIPTION
-alpha/rabbitmq-operator-helm            0.2.6           0.6             Helm for the RabbitMQ Operator
+alpha/rabbitmq-operator-helm            0.2.7           0.7             Helm for the RabbitMQ Operator
 ```
 
 Install the package:
