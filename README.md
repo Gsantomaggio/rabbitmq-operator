@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/Gsantomaggio/rabbitmq-operator.svg?branch=master)](https://travis-ci.org/Gsantomaggio/rabbitmq-operator) [![Coverage Status](https://coveralls.io/repos/github/Gsantomaggio/rabbitmq-operator/badge.png?branch=master)](https://coveralls.io/github/Gsantomaggio/rabbitmq-operator?branch=master)
 
+This project is not mainted anymore. I joined to the Kubernetes RabbitMQ team, so consider to use the official RabbitMQ cluster Operator:
+https://github.com/rabbitmq/cluster-operator
+=
+
 The easier way to deploy a RabbitMQ Cluster on Kubernetes.
 
 Current Features:
